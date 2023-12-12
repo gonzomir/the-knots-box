@@ -5,8 +5,8 @@
 
 #include "draw.h"
 
-#include "fonts/RethinkSans/rethinksans-bold-24.h"
-#include "fonts/RethinkSans/rethinksans-bold-90.h"
+#include "fonts/RethinkSans/rethinksans-bold-16.h"
+#include "fonts/RethinkSans/rethinksans-bold-92.h"
 
 #if defined(ESP32)
 #define MAX_DISPLAY_BUFFER_SIZE 65536ul // e.g.
@@ -49,7 +49,7 @@ void drawSpeed(float speed) {
   Serial.println(speed_r);
 
   display.setRotation(0);
-  display.setFont(&RethinkSans_Bold90pt7b);
+  display.setFont(&RethinkSans_Bold92pt7b);
   display.setTextColor(GxEPD_BLACK);
 
   display.setPartialWindow(padding, padding, display.width() - padding, display.height() - padding);
@@ -74,6 +74,33 @@ void drawSpeed(float speed) {
   } while (display.nextPage());
 
   Serial.println("Drew speed.");
+}
+
+void drawStatus(String text) {
+  display.setRotation(0);
+  display.setFont(&RethinkSans_Bold16pt7b);
+  display.setTextColor(GxEPD_BLACK);
+
+  display.setPartialWindow(0, 0, display.width(), 40);
+
+  int16_t x = 20;
+  int16_t y = 30;
+
+  do {
+    display.fillRect(0, 0, display.width(), 40, GxEPD_WHITE);
+    display.setCursor(x, y);
+    display.print(text);
+  } while (display.nextPage());
+}
+
+void clearStatus() {
+  display.setRotation(0);
+
+  display.setPartialWindow(0, 0, display.width(), 40);
+
+  do {
+    display.fillRect(0, 0, display.width(), 40, GxEPD_WHITE);
+  } while (display.nextPage());
 }
 
 void drawBox(uint16_t x, uint16_t y, uint16_t w, uint16_t h, bool partial) {

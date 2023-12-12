@@ -21,4 +21,6 @@
 
 void setupDisplay();
 void drawSpeed(float speed);
+void drawStatus(String text);
+void clearStatus();
 void drawBox(uint16_t x, uint16_t y, uint16_t w, uint16_t h, bool partial);
