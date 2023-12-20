@@ -25,12 +25,11 @@ void loop() {
     data = Serial2.readStringUntil('\n');
     // Remove trailing newline.
     data.remove(data.length() -1);
+    Serial.println(data);
 
     const char * str = data.c_str();
     if (parser.dispatch(str)) {
-      Serial.println(parser.getLastProcessedType());
-
-      // Guess the last parsed sentence type.
+      // Get the last parsed sentence type.
       switch(parser.getLastProcessedType()) {
         // Is it a GPRMC sentence?
         case NMEAParser::TYPE_GPRMC:
@@ -39,6 +38,7 @@ void loop() {
           Serial.println(parser.last_gprmc.speed_over_ground);
           break;
         case NMEAParser::TYPE_GPGGA:
+          // Update status.
           sprintf(status, "Sats: %d; Acc: %d m", parser.last_gpgga.satellites_used, parser.last_gpgga.hdop);
           drawStatus(status);
           break;
