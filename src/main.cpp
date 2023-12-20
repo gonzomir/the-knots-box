@@ -1,48 +1,62 @@
 
+#include <cstdio>
+#include <nmeaparser.h>
+
 #include "draw.h"
+
+NMEAParser parser;
 
 void setup() {
   Serial.begin(115200);
-  Serial.println();
-  Serial.println("setup");
 
   setupDisplay();
 
-  drawStatus("Testing speed display...");
-  delay(1000);
+  drawStatus("Waiting for GPS...");
 
-  clearStatus();
-
-  Serial.println("Draw speed 2.1.");
-  drawSpeed(2.12345);
-  delay(1000);
-
-  Serial.println("Draw speed 1.5.");
-  drawSpeed(1.4681);
-  delay(1000);
-
-  Serial.println("Draw speed 4.5.");
-  drawSpeed(4.4681);
-  delay(1000);
-
-  Serial.println("Draw speed 4.8.");
-  drawSpeed(4.8281);
-  delay(1000);
-
-  Serial.println("Draw speed 5.2.");
-  drawSpeed(5.2);
-  delay(1000);
-
-  Serial.println("Draw speed 12.2.");
-  drawSpeed(12.2);
-  delay(1000);
-
-  drawStatus("Testing completed.");
-
-//  display.powerOff();
-  Serial.println("setup done");
+  Serial2.begin(9600, SERIAL_8N1, 16, 17);
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  char status[200];
+
+  String data = "";
+
+  while (Serial2.available()) {
+    data = Serial2.readStringUntil('\n');
+    // Remove trailing newline.
+    data.remove(data.length() -1);
+    Serial.println(data);
+
+    const char * str = data.c_str();
+    if (parser.dispatch(str)) {
+      // Get the last parsed sentence type.
+      switch(parser.getLastProcessedType()) {
+        // Is it a GPRMC sentence?
+        case NMEAParser::TYPE_GPRMC:
+          // Show speed.
+          drawSpeed(parser.last_gprmc.speed_over_ground);
+          Serial.println(parser.last_gprmc.speed_over_ground);
+          break;
+        case NMEAParser::TYPE_GPGGA:
+          // Update status.
+          sprintf(status, "Sats: %d; Acc: %d m", parser.last_gpgga.satellites_used, parser.last_gpgga.hdop);
+          drawStatus(status);
+          break;
+        case NMEAParser::UNKNOWN:
+        case NMEAParser::TYPE_PLSR2451:
+        case NMEAParser::TYPE_PLSR2452:
+        case NMEAParser::TYPE_PLSR2457:
+        case NMEAParser::TYPE_GPGSV:
+        case NMEAParser::TYPE_GPGSA:
+        case NMEAParser::TYPE_HCHDG:
+        case NMEAParser::TYPE_GPGLL:
+        case NMEAParser::TYPE_GPVTG:
+        case NMEAParser::TYPE_GPTXT:
+          break;
+      }
+
+    }
+  }
+
+  delay(500);
 }
