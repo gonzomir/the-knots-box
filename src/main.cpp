@@ -9,6 +9,9 @@ NMEAParser parser;
 void IRAM_ATTR go_to_sleep() {
   detachInterrupt(digitalPinToInterrupt(33));
 
+  clearDisplay();
+  powerOffDisplay();
+
   Serial.println("Going to sleep.");
   esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, 1);
   esp_deep_sleep_start();

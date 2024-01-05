@@ -20,6 +20,7 @@
 #define IS_GxEPD2_1248(x) IS_GxEPD(GxEPD2_1248_IS_, x)
 
 void setupDisplay();
+void powerOffDisplay();
 void clearDisplay();
 void drawSpeed(float speed);
 void drawStatus(String text);
