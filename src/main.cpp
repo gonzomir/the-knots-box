@@ -35,7 +35,6 @@ void loop() {
         case NMEAParser::TYPE_GPRMC:
           // Show speed.
           drawSpeed(parser.last_gprmc.speed_over_ground);
-          Serial.println(parser.last_gprmc.speed_over_ground);
           break;
         case NMEAParser::TYPE_GPGGA:
           // Update status.

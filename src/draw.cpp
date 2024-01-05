@@ -40,13 +40,10 @@ void setupDisplay() {
 }
 
 void drawSpeed(float speed) {
-  Serial.println("Drawing speed...");
-
   int padding = 50;
 
   char speed_r[4];
   std::sprintf(speed_r, "%0.1f", std::round(speed * 10) / 10);
-  Serial.println(speed_r);
 
   display.setRotation(0);
   display.setFont(&RethinkSans_Bold92pt7b);
@@ -64,16 +61,14 @@ void drawSpeed(float speed) {
     x = display.width() - tbw - 50;
   }
 
-  Serial.printf("%d %d %d %d", display.width(), tbx, tbw, x);
-  Serial.println("");
+  // Serial.printf("%d %d %d %d", display.width(), tbx, tbw, x);
+  // Serial.println("");
 
   do {
     display.fillRect(padding, padding, display.width() - padding, display.height() - padding, GxEPD_WHITE);
     display.setCursor(x, y);
     display.print(speed_r);
   } while (display.nextPage());
-
-  Serial.println("Drew speed.");
 }
 
 void drawStatus(String text) {
@@ -104,7 +99,6 @@ void clearStatus() {
 }
 
 void drawBox(uint16_t x, uint16_t y, uint16_t w, uint16_t h, bool partial) {
-  Serial.println("drawBox");
   display.setRotation(0);
 
   if (partial) {
@@ -119,6 +113,4 @@ void drawBox(uint16_t x, uint16_t y, uint16_t w, uint16_t h, bool partial) {
   do {
     display.fillRect(x, y, w, h, GxEPD_BLACK);
   } while (display.nextPage());
-
-  Serial.println("drawBox done");
 }
