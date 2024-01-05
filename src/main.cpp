@@ -10,10 +10,12 @@ void setup() {
   Serial.begin(115200);
 
   setupDisplay();
+  clearDisplay();
 
   drawStatus("Waiting for GPS...");
 
   Serial2.begin(9600, SERIAL_8N1, 16, 17);
+  Serial.println("Setup complete.");
 }
 
 void loop() {
@@ -33,6 +35,10 @@ void loop() {
       switch(parser.getLastProcessedType()) {
         // Is it a GPRMC sentence?
         case NMEAParser::TYPE_GPRMC:
+          // Clear display every 5 minutes.
+          if (atoi(parser.last_gprmc.utc_time) % 300 == 0 ) {
+            clearDisplay();
+          }
           // Show speed.
           drawSpeed(parser.last_gprmc.speed_over_ground);
           break;

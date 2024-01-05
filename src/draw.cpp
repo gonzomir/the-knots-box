@@ -37,6 +37,14 @@ void setupDisplay() {
   display.init(115200);
   display.setFullWindow();
   display.firstPage(); // Use paged drawing mode, sets fillScreen(GxEPD_WHITE)
+  display.fillScreen(GxEPD_WHITE);
+}
+
+void clearDisplay() {
+  display.setFullWindow();
+  do {
+    display.fillRect(0, 0, display.width(), display.height(), GxEPD_WHITE);
+  } while (display.nextPage());
 }
 
 void drawSpeed(float speed) {
