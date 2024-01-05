@@ -6,7 +6,18 @@
 
 NMEAParser parser;
 
+void IRAM_ATTR go_to_sleep() {
+  detachInterrupt(digitalPinToInterrupt(33));
+
+  Serial.println("Going to sleep.");
+  esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, 1);
+  esp_deep_sleep_start();
+}
+
 void setup() {
+  esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL);
+  pinMode(33, INPUT_PULLDOWN);
+
   Serial.begin(115200);
 
   setupDisplay();
@@ -15,6 +26,9 @@ void setup() {
   drawStatus("Waiting for GPS...");
 
   Serial2.begin(9600, SERIAL_8N1, 16, 17);
+
+  attachInterrupt(digitalPinToInterrupt(33), go_to_sleep, FALLING);
+
   Serial.println("Setup complete.");
 }
 
