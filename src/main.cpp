@@ -5,6 +5,7 @@
 #include "draw.h"
 
 NMEAParser parser;
+bool gps_is_ready = false;
 
 void setup() {
   Serial.begin(115200);
@@ -35,17 +36,23 @@ void loop() {
       switch(parser.getLastProcessedType()) {
         // Is it a GPRMC sentence?
         case NMEAParser::TYPE_GPRMC:
-          // Clear display every 5 minutes.
-          if (atoi(parser.last_gprmc.utc_time) % 300 == 0 ) {
-            clearDisplay();
+          if (gps_is_ready) {
+            int utime = atoi(parser.last_gprmc.utc_time);
+            // Clear display every 5 minutes.
+            if (utime > 300 && utime % 300 == 0 ) {
+              clearDisplay();
+            }
+            // Show speed.
+            drawSpeed(parser.last_gprmc.speed_over_ground);
           }
-          // Show speed.
-          drawSpeed(parser.last_gprmc.speed_over_ground);
           break;
         case NMEAParser::TYPE_GPGGA:
-          // Update status.
-          sprintf(status, "Sats: %d; Acc: %d m", parser.last_gpgga.satellites_used, parser.last_gpgga.hdop);
-          drawStatus(status);
+          gps_is_ready = (parser.last_gpgga.satellites_used > 3);
+          if (gps_is_ready) {
+            // Update status.
+            sprintf(status, "Sats: %d; Acc: %d m", parser.last_gpgga.satellites_used, parser.last_gpgga.hdop);
+            drawStatus(status);
+          }
           break;
         case NMEAParser::UNKNOWN:
         case NMEAParser::TYPE_PLSR2451:
