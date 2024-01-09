@@ -5,8 +5,13 @@
 #include "draw.h"
 
 NMEAParser parser;
+bool should_sleep = false;
 
-void IRAM_ATTR go_to_sleep() {
+void IRAM_ATTR button_pressed() {
+  should_sleep = true;
+}
+
+void go_to_sleep() {
   detachInterrupt(digitalPinToInterrupt(33));
 
   clearDisplay();
@@ -18,6 +23,7 @@ void IRAM_ATTR go_to_sleep() {
 }
 
 void setup() {
+  should_sleep = false;
   esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL);
   pinMode(33, INPUT_PULLDOWN);
 
@@ -30,12 +36,17 @@ void setup() {
 
   Serial2.begin(9600, SERIAL_8N1, 16, 17);
 
-  attachInterrupt(digitalPinToInterrupt(33), go_to_sleep, FALLING);
+  attachInterrupt(digitalPinToInterrupt(33), button_pressed, FALLING);
 
   Serial.println("Setup complete.");
 }
 
 void loop() {
+  if (should_sleep) {
+    go_to_sleep();
+    return;
+  }
+
   char status[200];
 
   String data = "";
