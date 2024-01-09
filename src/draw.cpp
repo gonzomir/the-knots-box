@@ -24,6 +24,9 @@ GxEPD2_DISPLAY_CLASS<GxEPD2_DRIVER_CLASS, MAX_HEIGHT(GxEPD2_DRIVER_CLASS)> displ
 SPIClass hspi(HSPI);
 #endif
 
+int padding = 50;
+int battery_status_w = 140;
+
 void setupDisplay() {
   // *** special handling for Waveshare ESP32 Driver board *** //
   // ********************************************************* //
@@ -52,8 +55,6 @@ void clearDisplay() {
 }
 
 void drawSpeed(float speed) {
-  int padding = 50;
-
   char speed_r[4];
   std::sprintf(speed_r, "%0.1f", std::round(speed * 10) / 10);
 
@@ -88,7 +89,7 @@ void drawStatus(String text) {
   display.setFont(&RethinkSans_Bold16pt7b);
   display.setTextColor(GxEPD_BLACK);
 
-  display.setPartialWindow(0, 0, display.width(), 40);
+  display.setPartialWindow(0, 0, display.width() - battery_status_w, 40);
 
   int16_t x = 20;
   int16_t y = 30;
@@ -103,12 +104,33 @@ void drawStatus(String text) {
 void clearStatus() {
   display.setRotation(0);
 
-  display.setPartialWindow(0, 0, display.width(), 40);
+  display.setPartialWindow(0, 0, display.width() - battery_status_w, 40);
 
   do {
     display.fillRect(0, 0, display.width(), 40, GxEPD_WHITE);
   } while (display.nextPage());
 }
+
+void drawBatteryStatus(int percentage) {
+  display.setRotation(0);
+  display.setFont(&RethinkSans_Bold16pt7b);
+  display.setTextColor(GxEPD_BLACK);
+
+  display.setPartialWindow(display.width() - battery_status_w, 0, display.width() - battery_status_w, 40);
+
+  int16_t x = display.width() - battery_status_w;
+  int16_t y = 30;
+  char status[9];
+
+  sprintf(status, "Bat: %d%%", percentage);
+
+  do {
+    display.fillRect(display.width() - battery_status_w, 0, display.width() - battery_status_w, 40, GxEPD_WHITE);
+    display.setCursor(x, y);
+    display.print(status);
+  } while (display.nextPage());
+}
+
 
 void drawBox(uint16_t x, uint16_t y, uint16_t w, uint16_t h, bool partial) {
   display.setRotation(0);

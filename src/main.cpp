@@ -82,6 +82,7 @@ void loop() {
           if (gps_is_ready) {
             // Update status.
             sprintf(status, "Sats: %d; Acc: %d m", parser.last_gpgga.satellites_used, parser.last_gpgga.hdop);
+            drawStatus(status);
           }
           break;
         case NMEAParser::UNKNOWN:
@@ -110,9 +111,7 @@ void loop() {
     return;
   }
 
-  sprintf(status, "%s; Bat: %d%%", status, battery_percents);
-
-  drawStatus(status);
+  drawBatteryStatus(battery_percents);
 
   delay(500);
 }
