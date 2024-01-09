@@ -106,7 +106,7 @@ void loop() {
   Serial.println(voltage);
   Serial.println(battery_percents);
 
-  if (battery_percents < 2) {
+  if (battery_percents < 2.0) {
     go_to_sleep();
     return;
   }

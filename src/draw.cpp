@@ -120,7 +120,7 @@ void drawBatteryStatus(int percentage) {
 
   int16_t x = display.width() - battery_status_w;
   int16_t y = 30;
-  char status[9];
+  char status[10];
 
   sprintf(status, "Bat: %d%%", percentage);
 
