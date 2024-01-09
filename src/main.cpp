@@ -2,6 +2,7 @@
 #include <cstdio>
 #include <nmeaparser.h>
 
+#include "battery.h"
 #include "draw.h"
 
 NMEAParser parser;
@@ -28,6 +29,8 @@ void setup() {
   esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL);
   pinMode(33, INPUT_PULLDOWN);
 
+  pinMode(35, INPUT);
+
   Serial.begin(115200);
 
   setupDisplay();
@@ -48,7 +51,7 @@ void loop() {
     return;
   }
 
-  char status[200];
+  char status[200] = "";
 
   String data = "";
 
@@ -79,7 +82,6 @@ void loop() {
           if (gps_is_ready) {
             // Update status.
             sprintf(status, "Sats: %d; Acc: %d m", parser.last_gpgga.satellites_used, parser.last_gpgga.hdop);
-            drawStatus(status);
           }
           break;
         case NMEAParser::UNKNOWN:
@@ -97,6 +99,20 @@ void loop() {
 
     }
   }
+
+  float voltage = get_battery_voltage();
+  int battery_percents = get_battery_percents(voltage);
+  Serial.println(voltage);
+  Serial.println(battery_percents);
+
+  if (battery_percents < 2) {
+    go_to_sleep();
+    return;
+  }
+
+  sprintf(status, "%s; Bat: %d%%", status, battery_percents);
+
+  drawStatus(status);
 
   delay(500);
 }
