@@ -40,6 +40,10 @@ void setupDisplay() {
   display.fillScreen(GxEPD_WHITE);
 }
 
+void powerOffDisplay() {
+  display.powerOff();
+}
+
 void clearDisplay() {
   display.setFullWindow();
   do {

@@ -5,9 +5,29 @@
 #include "draw.h"
 
 NMEAParser parser;
+bool should_sleep = false;
 bool gps_is_ready = false;
 
+void IRAM_ATTR button_pressed() {
+  should_sleep = true;
+}
+
+void go_to_sleep() {
+  detachInterrupt(digitalPinToInterrupt(33));
+
+  clearDisplay();
+  powerOffDisplay();
+
+  Serial.println("Going to sleep.");
+  esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, 1);
+  esp_deep_sleep_start();
+}
+
 void setup() {
+  should_sleep = false;
+  esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL);
+  pinMode(33, INPUT_PULLDOWN);
+
   Serial.begin(115200);
 
   setupDisplay();
@@ -16,10 +36,18 @@ void setup() {
   drawStatus("Waiting for GPS...");
 
   Serial2.begin(9600, SERIAL_8N1, 16, 17);
+
+  attachInterrupt(digitalPinToInterrupt(33), button_pressed, FALLING);
+
   Serial.println("Setup complete.");
 }
 
 void loop() {
+  if (should_sleep) {
+    go_to_sleep();
+    return;
+  }
+
   char status[200];
 
   String data = "";
