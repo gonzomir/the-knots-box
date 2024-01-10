@@ -8,7 +8,7 @@
 NMEAParser parser;
 bool should_sleep = false;
 bool gps_is_ready = false;
-unsigned int last_battery_read = 0;
+suseconds_t last_battery_read = 0;
 
 void IRAM_ATTR button_pressed() {
   should_sleep = true;
