@@ -7,11 +7,12 @@ float get_battery_voltage() {
 		raw += analogRead(35);
 	}
 	raw = raw / 5;
-	float voltage = ((float)raw / 4096) * 3.2;
+	float voltage = ((float)raw / 4095) * 3.1;
 	Serial.println(voltage);
 	// The voltage devider is 33k to 100k, so the multiplier is (100 + 33) / 100 = 1.33.
-	// Actual readings show multiplier is 1.15625.
-	return voltage * 1.33;
+	// If we take into account ESP32's GPIO impedance (1.3Mohms), the resulting
+	// multiplier is (93 + 33) / 93 = 1.3548
+	return voltage * 1.3548;
 }
 
 int get_battery_percents(float voltage) {
