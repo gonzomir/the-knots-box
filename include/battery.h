@@ -4,6 +4,7 @@
 #include "esp_adc_cal.h"
 #include "soc/adc_channel.h"
 
+// This fixes compile error, see https://github.com/esphome/issues/issues/2982.
 #undef ADC_WIDTH_BIT_DEFAULT
 #define ADC_WIDTH_BIT_DEFAULT   ((adc_bits_width_t) ((int)ADC_WIDTH_MAX-1))
 
