@@ -32,6 +32,8 @@ void setup() {
 
   pinMode(35, INPUT);
 
+  calibrate_adc();
+
   Serial.begin(115200);
 
   setupDisplay();
