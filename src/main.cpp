@@ -10,10 +10,16 @@ bool should_sleep = false;
 bool gps_is_ready = false;
 suseconds_t last_battery_read = 0;
 
+/**
+ * On/off button unterrupt handler.
+ */
 void IRAM_ATTR button_pressed() {
   should_sleep = true;
 }
 
+/**
+ * Put the chip in deep sleep and power off the display.
+ */
 void go_to_sleep() {
   detachInterrupt(digitalPinToInterrupt(33));
 
@@ -25,6 +31,9 @@ void go_to_sleep() {
   esp_deep_sleep_start();
 }
 
+/**
+ * Setup routine.
+ */
 void setup() {
   should_sleep = false;
   esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL);
@@ -48,6 +57,9 @@ void setup() {
   Serial.println("Setup complete.");
 }
 
+/**
+ * Main loop.
+ */
 void loop() {
   if (should_sleep) {
     go_to_sleep();

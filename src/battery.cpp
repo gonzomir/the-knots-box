@@ -10,6 +10,9 @@
 
 static esp_adc_cal_characteristics_t adc_chars;
 
+/**
+ * Calibrate the ADC.
+ */
 void calibrate_adc() {
 	esp_err_t ret;
 
@@ -19,7 +22,11 @@ void calibrate_adc() {
 	}
 }
 
-
+/**
+ * Get the battery voltage.
+ *
+ * @return float Battery voltage.
+ */
 float get_battery_voltage() {
 	adc1_config_channel_atten(ADC1_GPIO35_CHANNEL, ADC_ATTEN_DB_11);
 
@@ -35,6 +42,12 @@ float get_battery_voltage() {
 	return voltage * 2.04;
 }
 
+/**
+ * Convert battery voltage to battery capacity percentage.
+ *
+ * @param voltage Battery voltage.
+ * @return int Capacity percantege.
+ */
 int get_battery_percents(float voltage) {
 	// This formula was calculated using samples collected from a lipo battery.
 	double percents = 2808.3808 * pow(voltage, 4) - 43560.9157 * pow(voltage, 3) + 252848.5888 * pow(voltage, 2) - 650767.4615 * voltage + 626532.5703;

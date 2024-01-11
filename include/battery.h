@@ -10,6 +10,22 @@
 
 static esp_adc_cal_characteristics_t adc_chars;
 
+/**
+ * Calibrate the ADC.
+ */
 void calibrate_adc();
+
+/**
+ * Get the battery voltage.
+ *
+ * @return float Battery voltage.
+ */
 float get_battery_voltage();
+
+/**
+ * Convert battery voltage to battery capacity percentage.
+ *
+ * @param voltage Battery voltage.
+ * @return int Capacity percantege.
+ */
 int get_battery_percents(float voltage);

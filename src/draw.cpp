@@ -27,6 +27,9 @@ SPIClass hspi(HSPI);
 int padding = 50;
 int battery_status_w = 140;
 
+/**
+ * Setup the display.
+ */
 void setup_display() {
   // *** special handling for Waveshare ESP32 Driver board *** //
   // ********************************************************* //
@@ -43,10 +46,16 @@ void setup_display() {
   display.fillScreen(GxEPD_WHITE);
 }
 
+/**
+ * Power off the display.
+ */
 void power_off_display() {
   display.powerOff();
 }
 
+/**
+ * Clear the display.
+ */
 void clear_display() {
   display.setFullWindow();
   do {
@@ -54,6 +63,11 @@ void clear_display() {
   } while (display.nextPage());
 }
 
+/**
+ * Draw speed in knots.
+ *
+ * @param speed
+ */
 void draw_speed(float speed) {
   char speed_r[4];
   std::sprintf(speed_r, "%0.1f", std::round(speed * 10) / 10);
@@ -84,6 +98,11 @@ void draw_speed(float speed) {
   } while (display.nextPage());
 }
 
+/**
+ * Draw status text.
+ *
+ * @param text
+ */
 void draw_status(String text) {
   display.setRotation(0);
   display.setFont(&RethinkSans_Bold16pt7b);
@@ -101,6 +120,9 @@ void draw_status(String text) {
   } while (display.nextPage());
 }
 
+/**
+ * Clear status text area.
+ */
 void clear_status() {
   display.setRotation(0);
 
@@ -111,6 +133,11 @@ void clear_status() {
   } while (display.nextPage());
 }
 
+/**
+ * Draw battery capacity indicator.
+ *
+ * @param percentage Battery capacity.
+ */
 void draw_battery_status(int percentage) {
   display.setRotation(0);
   display.setFont(&RethinkSans_Bold16pt7b);
@@ -131,7 +158,15 @@ void draw_battery_status(int percentage) {
   } while (display.nextPage());
 }
 
-
+/**
+ * Draw rectangle on the screen.
+ *
+ * @param x Start point X coordinate.
+ * @param y Start point Y coordinate.
+ * @param w Width of the rectangle.
+ * @param h Height of the rectangle.
+ * @param partial Partial or full screen draw.
+ */
 void draw_box(uint16_t x, uint16_t y, uint16_t w, uint16_t h, bool partial) {
   display.setRotation(0);
 
