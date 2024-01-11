@@ -17,8 +17,8 @@ void IRAM_ATTR button_pressed() {
 void go_to_sleep() {
   detachInterrupt(digitalPinToInterrupt(33));
 
-  clearDisplay();
-  powerOffDisplay();
+  clear_display();
+  power_off_display();
 
   Serial.println("Going to sleep.");
   esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, 1);
@@ -36,10 +36,10 @@ void setup() {
 
   Serial.begin(115200);
 
-  setupDisplay();
-  clearDisplay();
+  setup_display();
+  clear_display();
 
-  drawStatus("Waiting for GPS...");
+  draw_status("Waiting for GPS...");
 
   Serial2.begin(9600, SERIAL_8N1, 16, 17);
 
@@ -74,10 +74,10 @@ void loop() {
             int utime = atoi(parser.last_gprmc.utc_time);
             // Clear display every 5 minutes.
             if (utime > 300 && utime % 300 == 0 ) {
-              clearDisplay();
+              clear_display();
             }
             // Show speed.
-            drawSpeed(parser.last_gprmc.speed_over_ground);
+            draw_speed(parser.last_gprmc.speed_over_ground);
           }
           break;
         case NMEAParser::TYPE_GPGGA:
@@ -85,7 +85,7 @@ void loop() {
           if (gps_is_ready) {
             // Update status.
             sprintf(status, "Sats: %d; Acc: %d m", parser.last_gpgga.satellites_used, parser.last_gpgga.hdop);
-            drawStatus(status);
+            draw_status(status);
           }
           break;
         case NMEAParser::UNKNOWN:
@@ -118,7 +118,7 @@ void loop() {
       return;
     }
 
-    drawBatteryStatus(battery_percents);
+    draw_battery_status(battery_percents);
     last_battery_read = current_time.tv_sec;
   }
 

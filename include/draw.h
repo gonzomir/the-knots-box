@@ -19,11 +19,11 @@
 #define IS_GxEPD2_7C(x) IS_GxEPD(GxEPD2_7C_IS_, x)
 #define IS_GxEPD2_1248(x) IS_GxEPD(GxEPD2_1248_IS_, x)
 
-void setupDisplay();
-void powerOffDisplay();
-void clearDisplay();
-void drawSpeed(float speed);
-void drawStatus(String text);
-void clearStatus();
-void drawBatteryStatus(int percentage);
-void drawBox(uint16_t x, uint16_t y, uint16_t w, uint16_t h, bool partial);
+void setup_display();
+void power_off_display();
+void clear_display();
+void draw_speed(float speed);
+void draw_status(String text);
+void clear_status();
+void draw_battery_status(int percentage);
+void draw_box(uint16_t x, uint16_t y, uint16_t w, uint16_t h, bool partial);
