@@ -1,12 +1,14 @@
-
+#include <sys/time.h>
 #include <cstdio>
 #include <nmeaparser.h>
 
+#include "battery.h"
 #include "draw.h"
 
 NMEAParser parser;
 bool should_sleep = false;
 bool gps_is_ready = false;
+suseconds_t last_battery_read = 0;
 
 void IRAM_ATTR button_pressed() {
   should_sleep = true;
@@ -28,6 +30,10 @@ void setup() {
   esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL);
   pinMode(33, INPUT_PULLDOWN);
 
+  pinMode(35, INPUT);
+
+  calibrate_adc();
+
   Serial.begin(115200);
 
   setupDisplay();
@@ -48,7 +54,7 @@ void loop() {
     return;
   }
 
-  char status[200];
+  char status[200] = "";
 
   String data = "";
 
@@ -96,6 +102,24 @@ void loop() {
       }
 
     }
+  }
+
+  struct timeval current_time;
+  gettimeofday(&current_time, NULL);
+
+  if (last_battery_read == 0 || current_time.tv_sec - last_battery_read > 59) {
+    float voltage = get_battery_voltage();
+    int battery_percents = get_battery_percents(voltage);
+    Serial.println(voltage);
+    Serial.println(battery_percents);
+
+    if (battery_percents < 2.0) {
+      go_to_sleep();
+      return;
+    }
+
+    drawBatteryStatus(battery_percents);
+    last_battery_read = current_time.tv_sec;
   }
 
   delay(500);
