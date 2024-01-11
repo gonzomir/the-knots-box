@@ -1,0 +1,1 @@
+This is an attempt to create a functional GPS lag for small sailboats. The hardware is based on ESP32, it currently uses ESP32-DevKit-C (a copy from Aliexpress), a Neo6M GPS chip (not accurate enought, will be changed) and 4 inch Waveshare eInc display. Hardware schematics will be published in another repository.
