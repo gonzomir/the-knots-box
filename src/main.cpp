@@ -110,9 +110,6 @@ void loop() {
           }
           break;
         case NMEAParser::TYPE_GPGGA:
-          sprintf(status, "GNSS: %s; Sats: %d", parser.lastGPGGA.gnss, parser.lastGPGGA.satellites_used);
-          Serial.println(status);
-
           gps_is_ready = (parser.lastGPGGA.satellites_used > 3);
           if (gps_is_ready) {
             // Update status.
