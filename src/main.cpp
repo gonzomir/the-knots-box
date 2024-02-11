@@ -113,7 +113,7 @@ void loop() {
           gps_is_ready = (parser.lastGPGGA.satellites_used > 3);
           if (gps_is_ready) {
             // Update status.
-            sprintf(status, "Sats: %d; Acc: %d m", parser.lastGPGGA.satellites_used, parser.lastGPGGA.hdop);
+            sprintf(status, "Sats: %d; Acc: %.2f m", parser.lastGPGGA.satellites_used, parser.lastGPGGA.hdop);
             draw_status(status);
           }
           break;
