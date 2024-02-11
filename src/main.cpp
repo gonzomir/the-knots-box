@@ -26,6 +26,9 @@ void go_to_sleep() {
   clear_display();
   power_off_display();
 
+  // GNSS off.
+  digitalWrite(18, LOW);
+
   Serial.println("Going to sleep.");
   esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, 1);
   esp_deep_sleep_start();
@@ -37,11 +40,16 @@ void go_to_sleep() {
 void setup() {
   should_sleep = false;
   esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL);
+  // On/off button.
   pinMode(33, INPUT_PULLDOWN);
 
+  // Battery voltage.
   pinMode(35, INPUT);
-
   calibrate_adc();
+
+  // GNSS On.
+  pinMode(18, OUTPUT);
+  digitalWrite(18, HIGH);
 
   Serial.begin(115200);
 
@@ -50,7 +58,7 @@ void setup() {
 
   draw_status("Waiting for GPS...");
 
-  Serial2.begin(9600, SERIAL_8N1, 16, 17);
+  Serial2.begin(38400, SERIAL_8N1, 16, 17);
 
   attachInterrupt(digitalPinToInterrupt(33), button_pressed, FALLING);
 
@@ -80,23 +88,35 @@ void loop() {
     if (parser.dispatch(str)) {
       // Get the last parsed sentence type.
       switch(parser.getLastProcessedType()) {
-        // Is it a GPRMC sentence?
         case NMEAParser::TYPE_GPRMC:
           if (gps_is_ready) {
-            int utime = atoi(parser.last_gprmc.utc_time);
+            int utime = atoi(parser.lastGPRMC.utc_time);
             // Clear display every 5 minutes.
             if (utime > 300 && utime % 300 == 0 ) {
               clear_display();
             }
+          }
+          break;
+        case NMEAParser::TYPE_GPVTG:
+          if (gps_is_ready) {
+            float speed = 0;
+            if (parser.lastGPVTG.ground_speed_unit_1 == 'N') {
+              speed = parser.lastGPVTG.ground_speed_1;
+            } else if (parser.lastGPVTG.ground_speed_unit_2 == 'N') {
+              speed = parser.lastGPVTG.ground_speed_2;
+            }
             // Show speed.
-            draw_speed(parser.last_gprmc.speed_over_ground);
+            draw_speed(speed);
           }
           break;
         case NMEAParser::TYPE_GPGGA:
-          gps_is_ready = (parser.last_gpgga.satellites_used > 3);
+          sprintf(status, "GNSS: %s; Sats: %d", parser.lastGPGGA.gnss, parser.lastGPGGA.satellites_used);
+          Serial.println(status);
+
+          gps_is_ready = (parser.lastGPGGA.satellites_used > 3);
           if (gps_is_ready) {
             // Update status.
-            sprintf(status, "Sats: %d; Acc: %d m", parser.last_gpgga.satellites_used, parser.last_gpgga.hdop);
+            sprintf(status, "Sats: %d; Acc: %d m", parser.lastGPGGA.satellites_used, parser.lastGPGGA.hdop);
             draw_status(status);
           }
           break;
@@ -108,11 +128,12 @@ void loop() {
         case NMEAParser::TYPE_GPGSA:
         case NMEAParser::TYPE_HCHDG:
         case NMEAParser::TYPE_GPGLL:
-        case NMEAParser::TYPE_GPVTG:
         case NMEAParser::TYPE_GPTXT:
           break;
       }
 
+    } else {
+      Serial.println("Failed parsing NMEA sentence.");
     }
   }
 
