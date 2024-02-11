@@ -19,11 +19,54 @@
 #define IS_GxEPD2_7C(x) IS_GxEPD(GxEPD2_7C_IS_, x)
 #define IS_GxEPD2_1248(x) IS_GxEPD(GxEPD2_1248_IS_, x)
 
-void setupDisplay();
-void powerOffDisplay();
-void clearDisplay();
-void drawSpeed(float speed);
-void drawStatus(String text);
-void clearStatus();
-void drawBatteryStatus(int percentage);
-void drawBox(uint16_t x, uint16_t y, uint16_t w, uint16_t h, bool partial);
+/**
+ * Setup the display.
+ */
+void setup_display();
+
+/**
+ * Power off the display.
+ */
+void power_off_display();
+
+/**
+ * Clear the display.
+ */
+void clear_display();
+
+/**
+ * Draw speed in knots.
+ *
+ * @param speed
+ */
+void draw_speed(float speed);
+
+/**
+ * Draw status text.
+ *
+ * @param text
+ */
+void draw_status(String text);
+
+/**
+ * Clear status text area.
+ */
+void clear_status();
+
+/**
+ * Draw battery capacity indicator.
+ *
+ * @param percentage Battery capacity.
+ */
+void draw_battery_status(int percentage);
+
+/**
+ * Draw rectangle on the screen.
+ *
+ * @param x Start point X coordinate.
+ * @param y Start point Y coordinate.
+ * @param w Width of the rectangle.
+ * @param h Height of the rectangle.
+ * @param partial Partial or full screen draw.
+ */
+void draw_box(uint16_t x, uint16_t y, uint16_t w, uint16_t h, bool partial);

@@ -27,7 +27,10 @@ SPIClass hspi(HSPI);
 int padding = 50;
 int battery_status_w = 140;
 
-void setupDisplay() {
+/**
+ * Setup the display.
+ */
+void setup_display() {
   // *** special handling for Waveshare ESP32 Driver board *** //
   // ********************************************************* //
 #if defined(ESP32) && defined(USE_HSPI_FOR_EPD)
@@ -43,18 +46,29 @@ void setupDisplay() {
   display.fillScreen(GxEPD_WHITE);
 }
 
-void powerOffDisplay() {
+/**
+ * Power off the display.
+ */
+void power_off_display() {
   display.powerOff();
 }
 
-void clearDisplay() {
+/**
+ * Clear the display.
+ */
+void clear_display() {
   display.setFullWindow();
   do {
     display.fillRect(0, 0, display.width(), display.height(), GxEPD_WHITE);
   } while (display.nextPage());
 }
 
-void drawSpeed(float speed) {
+/**
+ * Draw speed in knots.
+ *
+ * @param speed
+ */
+void draw_speed(float speed) {
   char speed_r[4];
   std::sprintf(speed_r, "%0.1f", std::round(speed * 10) / 10);
 
@@ -84,7 +98,12 @@ void drawSpeed(float speed) {
   } while (display.nextPage());
 }
 
-void drawStatus(String text) {
+/**
+ * Draw status text.
+ *
+ * @param text
+ */
+void draw_status(String text) {
   display.setRotation(0);
   display.setFont(&RethinkSans_Bold16pt7b);
   display.setTextColor(GxEPD_BLACK);
@@ -101,7 +120,10 @@ void drawStatus(String text) {
   } while (display.nextPage());
 }
 
-void clearStatus() {
+/**
+ * Clear status text area.
+ */
+void clear_status() {
   display.setRotation(0);
 
   display.setPartialWindow(0, 0, display.width() - battery_status_w, 40);
@@ -111,7 +133,12 @@ void clearStatus() {
   } while (display.nextPage());
 }
 
-void drawBatteryStatus(int percentage) {
+/**
+ * Draw battery capacity indicator.
+ *
+ * @param percentage Battery capacity.
+ */
+void draw_battery_status(int percentage) {
   display.setRotation(0);
   display.setFont(&RethinkSans_Bold16pt7b);
   display.setTextColor(GxEPD_BLACK);
@@ -131,8 +158,16 @@ void drawBatteryStatus(int percentage) {
   } while (display.nextPage());
 }
 
-
-void drawBox(uint16_t x, uint16_t y, uint16_t w, uint16_t h, bool partial) {
+/**
+ * Draw rectangle on the screen.
+ *
+ * @param x Start point X coordinate.
+ * @param y Start point Y coordinate.
+ * @param w Width of the rectangle.
+ * @param h Height of the rectangle.
+ * @param partial Partial or full screen draw.
+ */
+void draw_box(uint16_t x, uint16_t y, uint16_t w, uint16_t h, bool partial) {
   display.setRotation(0);
 
   if (partial) {
