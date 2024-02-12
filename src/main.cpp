@@ -29,6 +29,10 @@ void go_to_sleep() {
   // GNSS off.
   digitalWrite(18, LOW);
 
+  // Hold output pin states.
+  gpio_hold_en(GPIO_NUM_18);
+  gpio_deep_sleep_hold_en();
+
   Serial.println("Going to sleep.");
   esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, 1);
   esp_deep_sleep_start();
@@ -40,6 +44,11 @@ void go_to_sleep() {
 void setup() {
   should_sleep = false;
   esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL);
+
+  // Disable the hold on output pin states.
+  gpio_deep_sleep_hold_dis();
+  gpio_hold_dis(GPIO_NUM_18);
+
   // On/off button.
   pinMode(33, INPUT_PULLDOWN);
 
