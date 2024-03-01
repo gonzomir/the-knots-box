@@ -99,6 +99,15 @@ void draw_speed(float speed) {
 }
 
 /**
+ * Draw status bar.
+ *
+ * @param text
+ */
+void draw_status_bar() {
+  draw_box(0, 41, display.width(), 1, true);
+}
+
+/**
  * Draw status text.
  *
  * @param text

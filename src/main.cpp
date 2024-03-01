@@ -64,6 +64,7 @@ void setup() {
 
   setup_display();
   clear_display();
+  draw_status_bar();
 
   draw_status("Waiting for GPS...");
 
@@ -103,6 +104,7 @@ void loop() {
             // Clear display every 5 minutes.
             if (utime > 300 && utime % 300 == 0 ) {
               clear_display();
+              draw_status_bar();
             }
           }
           break;
