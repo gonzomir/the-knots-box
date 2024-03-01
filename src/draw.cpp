@@ -5,7 +5,7 @@
 
 #include "draw.h"
 
-#include "fonts/RethinkSans/rethinksans-bold-16.h"
+#include "fonts/RethinkSans/rethinksans-bold-12.h"
 #include "fonts/RethinkSans/rethinksans-bold-92.h"
 
 #if defined(ESP32)
@@ -105,7 +105,7 @@ void draw_speed(float speed) {
  */
 void draw_status(String text) {
   display.setRotation(0);
-  display.setFont(&RethinkSans_Bold16pt7b);
+  display.setFont(&RethinkSans_Bold12pt7b);
   display.setTextColor(GxEPD_BLACK);
 
   display.setPartialWindow(0, 0, display.width() - battery_status_w, 40);
@@ -140,7 +140,7 @@ void clear_status() {
  */
 void draw_battery_status(int percentage) {
   display.setRotation(0);
-  display.setFont(&RethinkSans_Bold16pt7b);
+  display.setFont(&RethinkSans_Bold12pt7b);
   display.setTextColor(GxEPD_BLACK);
 
   display.setPartialWindow(display.width() - battery_status_w, 0, display.width() - battery_status_w, 40);
