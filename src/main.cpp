@@ -1,5 +1,6 @@
 #include <sys/time.h>
 #include <cstdio>
+#include <string>
 #include <nmeaparser.h>
 
 #include "battery.h"
@@ -100,11 +101,18 @@ void loop() {
       switch(parser.getLastProcessedType()) {
         case NMEAParser::TYPE_GPRMC:
           if (gps_is_ready) {
-            int utime = atoi(parser.lastGPRMC.utc_time);
+            std::string gps_time = parser.lastGPRMC.utc_time;
+            int hours = atoi(gps_time.substr(0, 2).c_str());
+            int minutes = atoi(gps_time.substr(2, 2).c_str());
+            int seconds = atoi(gps_time.substr(4, 2).c_str());
+
+            draw_time(hours, minutes, seconds);
+
             // Clear display every 5 minutes.
-            if (utime > 300 && utime % 300 == 0 ) {
+            if (minutes % 5 == 0 && seconds == 0) {
               clear_display();
               draw_status_bar();
+              last_battery_read = 0;
             }
           }
           break;

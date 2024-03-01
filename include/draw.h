@@ -66,6 +66,16 @@ void clear_status();
 void draw_battery_status(int percentage);
 
 /**
+ * Draw time.
+ *
+ * @param hours
+ * @param minutes
+ * @param seconds
+ */
+void draw_time(int hours, int minutes, int seconds);
+
+
+/**
  * Draw rectangle on the screen.
  *
  * @param x Start point X coordinate.
