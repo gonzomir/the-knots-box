@@ -154,14 +154,29 @@ void draw_battery_status(int percentage) {
 
   display.setPartialWindow(display.width() - battery_status_w, 0, display.width() - battery_status_w, 40);
 
-  int16_t x = display.width() - battery_status_w;
-  int16_t y = 30;
-  char status[10];
+  int16_t bat_x = display.width() - battery_status_w + 4;
+  int16_t bat_y = 10;
+  int16_t bat_w = 16;
+  int16_t bat_h = 25;
+  int16_t bat_b = 2;
 
-  sprintf(status, "Bat: %d%%", percentage);
+  int16_t percentage_rounded = round(percentage / 5) * 5;
+  int16_t bat_f = (bat_h - 2 * bat_b) * (1.00 - percentage_rounded / 100.00);
+
+  int16_t x = display.width() - battery_status_w + 24;
+  int16_t y = 30;
+  char status[4];
+
+  sprintf(status, "%d%%", percentage);
 
   do {
     display.fillRect(display.width() - battery_status_w, 0, display.width() - battery_status_w, 40, GxEPD_WHITE);
+
+    display.fillRect(bat_x, bat_y, bat_w, bat_h, GxEPD_BLACK);
+    display.fillRect(bat_x + bat_b, bat_y - bat_b, bat_w - 2 * bat_b, bat_b, GxEPD_BLACK);
+
+    display.fillRect(bat_x + bat_b, bat_y + bat_b, bat_w - 2 * bat_b, bat_f, GxEPD_WHITE);
+
     display.setCursor(x, y);
     display.print(status);
   } while (display.nextPage());
