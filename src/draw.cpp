@@ -25,8 +25,8 @@ SPIClass hspi(HSPI);
 #endif
 
 int padding = 50;
-int battery_status_w = 90;
-int time_w = 80;
+int battery_status_w = 100;
+int time_w = 90;
 
 /**
  * Setup the display.
@@ -60,7 +60,7 @@ void power_off_display() {
 void clear_display() {
   display.setFullWindow();
   do {
-    display.fillRect(0, 0, display.width(), display.height(), GxEPD_WHITE);
+    display.fillScreen(GxEPD_WHITE);
   } while (display.nextPage());
 }
 
@@ -83,7 +83,7 @@ void draw_speed(float speed) {
   display.getTextBounds(speed_r, 0, 0, &tbx, &tby, &tbw, &tbh);
 
   int16_t x = display.width() - tbw - 90;
-  int16_t y = 230;
+  int16_t y = 220;
 
   if (speed > 10) {
     x = display.width() - tbw - 50;
@@ -100,12 +100,21 @@ void draw_speed(float speed) {
 }
 
 /**
- * Draw status bar.
+ * Draw top status bar.
  *
  * @param text
  */
-void draw_status_bar() {
+void draw_top_bar() {
   draw_box(0, 41, display.width(), 1, true);
+}
+
+/**
+ * Draw bottom status bar.
+ *
+ * @param text
+ */
+void draw_bottom_bar() {
+  draw_box(0, display.height() - 41, display.width(), 1, true);
 }
 
 /**
@@ -118,13 +127,13 @@ void draw_status(String text) {
   display.setFont(&RethinkSans_Bold12pt7b);
   display.setTextColor(GxEPD_BLACK);
 
-  display.setPartialWindow(0, 0, display.width() - battery_status_w - time_w, 40);
+  display.setPartialWindow(0, display.height() - 40, display.width(), 40);
 
-  int16_t x = 20;
-  int16_t y = 30;
+  int16_t x = 10;
+  int16_t y = display.height() - 15;
 
   do {
-    display.fillRect(0, 0, display.width(), 40, GxEPD_WHITE);
+    display.fillRect(0, display.height() - 40, display.width(), 40, GxEPD_WHITE);
     display.setCursor(x, y);
     display.print(text);
   } while (display.nextPage());
@@ -136,10 +145,10 @@ void draw_status(String text) {
 void clear_status() {
   display.setRotation(0);
 
-  display.setPartialWindow(0, 0, display.width() - battery_status_w - time_w, 40);
+  display.setPartialWindow(0, display.height() - 40, display.width(), 40);
 
   do {
-    display.fillRect(0, 0, display.width() - battery_status_w - time_w, 40, GxEPD_WHITE);
+    display.fillRect(0, display.height() - 40, display.width(), 40, GxEPD_WHITE);
   } while (display.nextPage());
 }
 
@@ -153,9 +162,9 @@ void draw_battery_status(int percentage) {
   display.setFont(&RethinkSans_Bold12pt7b);
   display.setTextColor(GxEPD_BLACK);
 
-  display.setPartialWindow(display.width() - battery_status_w - time_w, 0, battery_status_w, 40);
+  display.setPartialWindow(display.width() - battery_status_w, 0, battery_status_w, 40);
 
-  int16_t bat_x = display.width() - battery_status_w - time_w + 4;
+  int16_t bat_x = display.width() - battery_status_w + 4;
   int16_t bat_y = 10;
   int16_t bat_w = 16;
   int16_t bat_h = 25;
@@ -164,14 +173,14 @@ void draw_battery_status(int percentage) {
   int16_t percentage_rounded = round(percentage / 5) * 5;
   int16_t bat_f = (bat_h - 2 * bat_b) * (1.00 - percentage_rounded / 100.00);
 
-  int16_t x = display.width() - battery_status_w - time_w + 24;
+  int16_t x = display.width() - battery_status_w + 24;
   int16_t y = 30;
   char status[4];
 
   sprintf(status, "%d%%", percentage);
 
   do {
-    display.fillRect(display.width() - battery_status_w - time_w, 0, battery_status_w, 40, GxEPD_WHITE);
+    display.fillRect(display.width() - battery_status_w, 0, battery_status_w, 40, GxEPD_WHITE);
 
     display.fillRect(bat_x, bat_y, bat_w, bat_h, GxEPD_BLACK);
     display.fillRect(bat_x + bat_b, bat_y - bat_b, bat_w - 2 * bat_b, bat_b, GxEPD_BLACK);
@@ -195,16 +204,16 @@ void draw_time(int hours, int minutes, int seconds) {
   display.setFont(&RethinkSans_Bold12pt7b);
   display.setTextColor(GxEPD_BLACK);
 
-  display.setPartialWindow(display.width() - time_w, 0, time_w, 40);
+  display.setPartialWindow(0, 0, time_w, 40);
 
-  int16_t x = display.width() - time_w + 2;
+  int16_t x = 10;
   int16_t y = 30;
 
   char time[6];
   sprintf(time, "%02d:%02d", hours, minutes);
 
   do {
-    display.fillRect(display.width() - time_w, 0, time_w, 40, GxEPD_WHITE);
+    display.fillRect(0, 0, time_w, 40, GxEPD_WHITE);
     display.setCursor(x, y);
     display.print(time);
   } while (display.nextPage());

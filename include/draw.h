@@ -42,9 +42,14 @@ void clear_display();
 void draw_speed(float speed);
 
 /**
- * Draw status bar and icons.
+ * Draw top status bar.
  */
-void draw_status_bar();
+void draw_top_bar();
+
+/**
+ * Draw bottom status bar.
+ */
+void draw_bottom_bar();
 
 /**
  * Draw status text.

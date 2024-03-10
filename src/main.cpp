@@ -65,7 +65,8 @@ void setup() {
 
   setup_display();
   clear_display();
-  draw_status_bar();
+  draw_top_bar();
+  draw_bottom_bar();
 
   draw_status("Waiting for GPS...");
 
@@ -93,7 +94,7 @@ void loop() {
     data = Serial2.readStringUntil('\n');
     // Remove trailing newline.
     data.remove(data.length() -1);
-    Serial.println(data);
+    //Serial.println(data);
 
     const char * str = data.c_str();
     if (parser.dispatch(str)) {
@@ -106,14 +107,15 @@ void loop() {
             int minutes = atoi(gps_time.substr(2, 2).c_str());
             int seconds = atoi(gps_time.substr(4, 2).c_str());
 
-            draw_time(hours, minutes, seconds);
-
             // Clear display every 5 minutes.
             if (minutes % 5 == 0 && seconds == 0) {
               clear_display();
-              draw_status_bar();
+              draw_top_bar();
+              draw_bottom_bar();
               last_battery_read = 0;
             }
+
+            draw_time(hours, minutes, seconds);
           }
           break;
         case NMEAParser::TYPE_GPVTG:
@@ -159,8 +161,8 @@ void loop() {
   if (last_battery_read == 0 || current_time.tv_sec - last_battery_read > 59) {
     float voltage = get_battery_voltage();
     int battery_percents = get_battery_percents(voltage);
-    Serial.println(voltage);
-    Serial.println(battery_percents);
+    //Serial.println(voltage);
+    //Serial.println(battery_percents);
 
     if (battery_percents < 2.0) {
       go_to_sleep();
