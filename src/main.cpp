@@ -24,7 +24,6 @@ void IRAM_ATTR button_pressed() {
 void go_to_sleep() {
   detachInterrupt(digitalPinToInterrupt(33));
 
-  clear_display();
   power_off_display();
 
   // GNSS off.

@@ -51,6 +51,13 @@ void setup_display() {
  * Power off the display.
  */
 void power_off_display() {
+  display.setFullWindow();
+  do {
+    display.fillScreen(GxEPD_BLACK);
+  } while (display.nextPage());
+  do {
+    display.fillScreen(GxEPD_WHITE);
+  } while (display.nextPage());
   display.powerOff();
 }
 
