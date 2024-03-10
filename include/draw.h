@@ -79,6 +79,12 @@ void draw_battery_status(int percentage);
  */
 void draw_time(int hours, int minutes, int seconds);
 
+/**
+ * Draw units.
+ *
+ * @param text
+ */
+void draw_units(String text);
 
 /**
  * Draw rectangle on the screen.

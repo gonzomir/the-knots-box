@@ -127,13 +127,13 @@ void draw_status(String text) {
   display.setFont(&RethinkSans_Bold12pt7b);
   display.setTextColor(GxEPD_BLACK);
 
-  display.setPartialWindow(0, display.height() - 40, display.width(), 40);
+  display.setPartialWindow(0, display.height() - 40, display.width() - 120, 40);
 
   int16_t x = 10;
   int16_t y = display.height() - 15;
 
   do {
-    display.fillRect(0, display.height() - 40, display.width(), 40, GxEPD_WHITE);
+    display.fillRect(0, display.height() - 40, display.width() - 120, 40, GxEPD_WHITE);
     display.setCursor(x, y);
     display.print(text);
   } while (display.nextPage());
@@ -145,10 +145,10 @@ void draw_status(String text) {
 void clear_status() {
   display.setRotation(0);
 
-  display.setPartialWindow(0, display.height() - 40, display.width(), 40);
+  display.setPartialWindow(0, display.height() - 40, display.width() - 120, 40);
 
   do {
-    display.fillRect(0, display.height() - 40, display.width(), 40, GxEPD_WHITE);
+    display.fillRect(0, display.height() - 40, display.width() - 120, 40, GxEPD_WHITE);
   } while (display.nextPage());
 }
 
@@ -216,6 +216,36 @@ void draw_time(int hours, int minutes, int seconds) {
     display.fillRect(0, 0, time_w, 40, GxEPD_WHITE);
     display.setCursor(x, y);
     display.print(time);
+  } while (display.nextPage());
+}
+
+/**
+ * Draw units.
+ *
+ * @param text
+ */
+void draw_units(String text) {
+  display.setRotation(0);
+  display.setFont(&RethinkSans_Bold12pt7b);
+  display.setTextColor(GxEPD_BLACK);
+
+  int16_t tbx, tby; uint16_t tbw, tbh;
+  display.getTextBounds(text, 0, 0, &tbx, &tby, &tbw, &tbh);
+
+  int16_t bx = display.width() - tbw - 20;
+  int16_t bw = tbw + 20;
+  int16_t by = display.height() - 40;
+  int16_t bh = 40;
+
+  int16_t tx = display.width() - tbw - 10;
+  int16_t ty = display.height() - 15;
+
+  display.setPartialWindow(bx, by, bw, bh);
+
+  do {
+    display.fillRect(bx, by, bw, bh, GxEPD_WHITE);
+    display.setCursor(tx, ty);
+    display.print(text);
   } while (display.nextPage());
 }
 

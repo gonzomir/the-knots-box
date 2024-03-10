@@ -67,6 +67,7 @@ void setup() {
   clear_display();
   draw_top_bar();
   draw_bottom_bar();
+  draw_units("SOG, Kn");
 
   draw_status("Waiting for GPS...");
 
@@ -112,6 +113,7 @@ void loop() {
               clear_display();
               draw_top_bar();
               draw_bottom_bar();
+              draw_units("SOG, Kn");
               last_battery_read = 0;
             }
 
