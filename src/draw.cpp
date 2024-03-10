@@ -77,7 +77,7 @@ void draw_speed(float speed) {
   display.setFont(&RethinkSans_Bold92pt7b);
   display.setTextColor(GxEPD_BLACK);
 
-  display.setPartialWindow(padding, padding, display.width() - 2 * padding, display.height() - 2 * padding);
+  display.setPartialWindow(padding / 2, padding, display.width() - padding, display.height() - 2 * padding);
 
   int16_t tbx, tby; uint16_t tbw, tbh;
   display.getTextBounds(speed_r, 0, 0, &tbx, &tby, &tbw, &tbh);
@@ -93,7 +93,7 @@ void draw_speed(float speed) {
   // Serial.println("");
 
   do {
-    display.fillRect(padding, padding, display.width() - 2 * padding, display.height() - 2 * padding, GxEPD_WHITE);
+    display.fillRect(padding / 2, padding, display.width() - padding, display.height() - 2 * padding, GxEPD_WHITE);
     display.setCursor(x, y);
     display.print(speed_r);
   } while (display.nextPage());
