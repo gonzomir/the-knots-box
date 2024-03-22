@@ -42,6 +42,16 @@ void clear_display();
 void draw_speed(float speed);
 
 /**
+ * Draw top status bar.
+ */
+void draw_top_bar();
+
+/**
+ * Draw bottom status bar.
+ */
+void draw_bottom_bar();
+
+/**
  * Draw status text.
  *
  * @param text
@@ -59,6 +69,22 @@ void clear_status();
  * @param percentage Battery capacity.
  */
 void draw_battery_status(int percentage);
+
+/**
+ * Draw time.
+ *
+ * @param hours
+ * @param minutes
+ * @param seconds
+ */
+void draw_time(int hours, int minutes, int seconds);
+
+/**
+ * Draw units.
+ *
+ * @param text
+ */
+void draw_units(String text);
 
 /**
  * Draw rectangle on the screen.
