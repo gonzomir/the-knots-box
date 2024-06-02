@@ -3,6 +3,7 @@
 #include <string>
 #include <nmeaparser.h>
 
+#include "config.h"
 #include "battery.h"
 #include "draw.h"
 
@@ -22,7 +23,7 @@ void IRAM_ATTR button_pressed() {
  * Put the chip in deep sleep and power off the display.
  */
 void go_to_sleep() {
-  detachInterrupt(digitalPinToInterrupt(33));
+  detachInterrupt(digitalPinToInterrupt(POWER_BTN));
 
   power_off_display();
 
@@ -30,11 +31,11 @@ void go_to_sleep() {
   digitalWrite(18, LOW);
 
   // Hold output pin states.
-  gpio_hold_en(GPIO_NUM_18);
+  gpio_hold_en(GNSS_EN_GPIO);
   gpio_deep_sleep_hold_en();
 
   Serial.println("Going to sleep.");
-  esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, 1);
+  esp_sleep_enable_ext0_wakeup(POWER_BTN_GPIO, 1);
   esp_deep_sleep_start();
 }
 
@@ -47,18 +48,18 @@ void setup() {
 
   // Disable the hold on output pin states.
   gpio_deep_sleep_hold_dis();
-  gpio_hold_dis(GPIO_NUM_18);
+  gpio_hold_dis(GNSS_EN_GPIO);
 
   // On/off button.
-  pinMode(33, INPUT_PULLDOWN);
+  pinMode(POWER_BTN, INPUT_PULLDOWN);
 
   // Battery voltage.
-  pinMode(35, INPUT);
+  pinMode(BATTERY_STATUS, INPUT);
   calibrate_adc();
 
   // GNSS On.
-  pinMode(18, OUTPUT);
-  digitalWrite(18, HIGH);
+  pinMode(GNSS_EN, OUTPUT);
+  digitalWrite(GNSS_EN, HIGH);
 
   Serial.begin(115200);
 
@@ -70,9 +71,9 @@ void setup() {
 
   draw_status("Waiting for GPS...");
 
-  Serial2.begin(38400, SERIAL_8N1, 16, 17);
+  Serial2.begin(38400, SERIAL_8N1, GNSS_RX, GNSS_TX);
 
-  attachInterrupt(digitalPinToInterrupt(33), button_pressed, FALLING);
+  attachInterrupt(digitalPinToInterrupt(POWER_BTN), button_pressed, FALLING);
 
   Serial.println("Setup complete.");
 }
