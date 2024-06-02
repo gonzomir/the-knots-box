@@ -7,3 +7,10 @@
 #define POWER_BTN 33
 #define POWER_BTN_GPIO GPIO_NUM_33
 #define BATTERY_STATUS 35
+
+#define DISPLAY_DIN 14
+#define DISPLAY_CLK 13
+#define DISPLAY_CS 15
+#define DISPLAY_DC 27
+#define DISPLAY_RST 26
+#define DISPLAY_BUSY 25
