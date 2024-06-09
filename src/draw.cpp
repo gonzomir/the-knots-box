@@ -3,6 +3,7 @@
 #include <GxEPD2_BW.h>
 #include <GxEPD2_3C.h>
 
+#include "config.h"
 #include "draw.h"
 
 #include "fonts/RethinkSans/rethinksans-bold-12.h"
@@ -17,7 +18,7 @@
 #elif IS_GxEPD2_7C(GxEPD2_DISPLAY_CLASS)
 #define MAX_HEIGHT(EPD) (EPD::HEIGHT <= (MAX_DISPLAY_BUFFER_SIZE) / (EPD::WIDTH / 2) ? EPD::HEIGHT : (MAX_DISPLAY_BUFFER_SIZE) / (EPD::WIDTH / 2))
 #endif
-GxEPD2_DISPLAY_CLASS<GxEPD2_DRIVER_CLASS, MAX_HEIGHT(GxEPD2_DRIVER_CLASS)> display(GxEPD2_DRIVER_CLASS(/*CS=*/ 15, /*DC=*/ 27, /*RST=*/ 26, /*BUSY=*/ 25));
+GxEPD2_DISPLAY_CLASS<GxEPD2_DRIVER_CLASS, MAX_HEIGHT(GxEPD2_DRIVER_CLASS)> display(GxEPD2_DRIVER_CLASS(DISPLAY_CS, DISPLAY_DC, DISPLAY_RST, DISPLAY_BUSY));
 #endif
 
 #if defined(ESP32) && defined(USE_HSPI_FOR_EPD)
@@ -35,7 +36,7 @@ void setup_display() {
   // *** special handling for Waveshare ESP32 Driver board *** //
   // ********************************************************* //
 #if defined(ESP32) && defined(USE_HSPI_FOR_EPD)
-  hspi.begin(13, 12, 14, 15); // remap hspi for EPD (swap pins)
+  hspi.begin(DISPLAY_CLK, 12, DISPLAY_DIN, DISPLAY_CS); // remap hspi for EPD (swap pins)
   display.epd2.selectSPI(hspi, SPISettings(4000000, MSBFIRST, SPI_MODE0));
 #endif
   // *** end of special handling for Waveshare ESP32 Driver board *** //
