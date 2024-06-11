@@ -11,6 +11,7 @@ NMEAParser parser;
 bool should_sleep = false;
 bool gps_is_ready = false;
 bool do_read_gnss = false;
+int  last_fix = 0;
 suseconds_t last_battery_read = 0;
 
 /**
@@ -44,6 +45,7 @@ void go_to_sleep() {
 void IRAM_ATTR read_gnss() {
   ets_printf("PPS triggered\n");
   do_read_gnss = true;
+  last_fix = millis();
 }
 
 /**
@@ -168,6 +170,12 @@ void loop() {
       } else {
         Serial.println("Failed parsing NMEA sentence.");
       }
+    }
+  } else {
+    int now = millis();
+    if (now > last_fix + 30 * 1000) {
+      draw_status("Waiting for GPS...");
+      draw_speed(0.0);
     }
   }
 
