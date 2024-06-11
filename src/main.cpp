@@ -12,6 +12,8 @@ bool should_sleep = false;
 bool gps_is_ready = false;
 bool do_read_gnss = false;
 int  last_fix = 0;
+String last_status = "";
+float last_speed = 0.0;
 suseconds_t last_battery_read = 0;
 
 /**
@@ -80,6 +82,7 @@ void setup() {
   draw_top_bar();
   draw_bottom_bar();
   draw_units("SOG, Kn");
+  draw_speed(0.0);
 
   draw_status("Waiting for GPS...");
 
@@ -102,7 +105,6 @@ void loop() {
 
   if (do_read_gnss) {
     do_read_gnss = false;
-    char status[200] = "";
 
     String data = "";
 
@@ -143,16 +145,25 @@ void loop() {
               } else if (parser.lastGPVTG.ground_speed_unit_2 == 'N') {
                 speed = parser.lastGPVTG.ground_speed_2;
               }
-              // Show speed.
-              draw_speed(speed);
+
+              if (speed != last_speed) {
+                // Show speed.
+                draw_speed(speed);
+                last_speed = speed;
+              }
             }
             break;
           case NMEAParser::TYPE_GPGGA:
             gps_is_ready = (parser.lastGPGGA.satellites_used > 3);
             if (gps_is_ready) {
+              char s[22] = "";
               // Update status.
-              sprintf(status, "Sats: %d; Acc: %.2f m", parser.lastGPGGA.satellites_used, parser.lastGPGGA.hdop);
-              draw_status(status);
+              sprintf(s, "Sats: %d; Acc: %.2f m", parser.lastGPGGA.satellites_used, parser.lastGPGGA.hdop);
+              String status = String(s);
+              if (status != last_status) {
+                draw_status(status);
+                last_status = status;
+              }
             }
             break;
           case NMEAParser::UNKNOWN:
@@ -174,8 +185,15 @@ void loop() {
   } else {
     int now = millis();
     if (now > last_fix + 30 * 1000) {
-      draw_status("Waiting for GPS...");
-      draw_speed(0.0);
+      String status = "Waiting for GPS...";
+      if (status != last_status) {
+        draw_status(status);
+        last_status = status;
+      }
+      if (last_speed != 0.0) {
+        draw_speed(0.0);
+        last_speed = 0.0;
+      }
     }
   }
 
