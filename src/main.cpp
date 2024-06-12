@@ -227,6 +227,4 @@ void loop() {
       last_battery_percents = battery_percents;
     }
   }
-
-  delay(500);
 }
