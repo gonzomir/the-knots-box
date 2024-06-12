@@ -14,7 +14,10 @@ bool do_read_gnss = false;
 int  last_fix = 0;
 String last_status = "";
 float last_speed = 0.0;
-suseconds_t last_battery_read = 0;
+bool battery_read = true;
+int last_battery_percents = 0;
+
+hw_timer_t *battery_timer = NULL;
 
 /**
  * On/off button unterrupt handler.
@@ -48,6 +51,10 @@ void IRAM_ATTR read_gnss() {
   ets_printf("PPS triggered\n");
   do_read_gnss = true;
   last_fix = millis();
+}
+
+void IRAM_ATTR read_battery() {
+  battery_read = true;
 }
 
 /**
@@ -91,6 +98,11 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(POWER_BTN), button_pressed, FALLING);
   attachInterrupt(digitalPinToInterrupt(GNSS_PPS), read_gnss, RISING);
 
+  battery_timer = timerBegin(0, 80, true);
+  timerAttachInterrupt(battery_timer, &read_battery, true);
+  timerAlarmWrite(battery_timer, 1000000 * 60, true);
+  timerAlarmEnable(battery_timer);
+
   Serial.println("Setup complete.");
 }
 
@@ -131,7 +143,8 @@ void loop() {
                 draw_top_bar();
                 draw_bottom_bar();
                 draw_units("SOG, Kn");
-                last_battery_read = 0;
+                battery_read = true;
+                last_battery_percents = 0;
               }
 
               draw_time(hours, minutes, seconds);
@@ -197,10 +210,8 @@ void loop() {
     }
   }
 
-  struct timeval current_time;
-  gettimeofday(&current_time, NULL);
-
-  if (last_battery_read == 0 || current_time.tv_sec - last_battery_read > 59) {
+  if (battery_read) {
+    battery_read = false;
     float voltage = get_battery_voltage();
     int battery_percents = get_battery_percents(voltage);
     //Serial.println(voltage);
@@ -211,8 +222,10 @@ void loop() {
       return;
     }
 
-    draw_battery_status(battery_percents);
-    last_battery_read = current_time.tv_sec;
+    if (battery_percents != last_battery_percents) {
+      draw_battery_status(battery_percents);
+      last_battery_percents = battery_percents;
+    }
   }
 
   delay(500);
