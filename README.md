@@ -1,4 +1,6 @@
-This is an attempt to create a functional GPS lag for small sailboats. The hardware is based on ESP32, it currently uses ESP32-DevKit-C (a copy from Aliexpress), a QUESCAN G10A-F30 GNSS module and 4 inch Waveshare eInc display.
+# The Knots Box
+
+An attempt to build a functional GPS lag for small sailboats. The hardware is based on ESP32, it currently uses ESP32-DevKit-C (a copy from Aliexpress), a QUESCAN G10A-F30 GNSS module and 4 inch Waveshare eInc display.
 
 ## Hardware
 
@@ -8,7 +10,7 @@ This is an attempt to create a functional GPS lag for small sailboats. The hardw
 * LiIon battery module based on TP4056 - because I had it available.
 * Some resistors and button to provide power on/off - actually deep sleep and wake up untill a more advanced schematics are implemented.
 
-A prototype PCB design is avalailable in a [separate repository](https://github.com/gonzomir/gps-lag-pcb).
+A prototype PCB design is avalailable in a [separate repository](https://github.com/gonzomir/the-knots-box-pcb).
 
 ## Software
 
