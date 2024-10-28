@@ -36,7 +36,7 @@ void go_to_sleep() {
   power_off_display();
 
   // GNSS off.
-  digitalWrite(18, LOW);
+  digitalWrite(GNSS_EN, LOW);
 
   // Hold output pin states.
   gpio_hold_en(GNSS_EN_GPIO);
