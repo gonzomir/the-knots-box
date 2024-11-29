@@ -1,8 +1,8 @@
 #define GNSS_RX 16
 #define GNSS_TX 17
-#define GNSS_PPS 19
-#define GNSS_EN 18
-#define GNSS_EN_GPIO GPIO_NUM_18
+#define GNSS_PPS 18
+#define GNSS_EN 19
+#define GNSS_EN_GPIO GPIO_NUM_19
 
 #define POWER_BTN 33
 #define POWER_BTN_GPIO GPIO_NUM_33
