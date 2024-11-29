@@ -3,6 +3,9 @@
 #include <string>
 #include <nmeaparser.h>
 
+#include "esp_bt.h"
+#include "esp_wifi.h"
+
 #include "config.h"
 #include "battery.h"
 #include "draw.h"
@@ -63,6 +66,10 @@ void IRAM_ATTR read_battery() {
 void setup() {
   should_sleep = false;
   esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL);
+
+  // Disable WiFi and Bluetooth.
+  esp_bt_controller_disable();
+  esp_wifi_stop();
 
   // Disable the hold on output pin states.
   gpio_deep_sleep_hold_dis();
