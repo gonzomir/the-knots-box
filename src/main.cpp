@@ -103,6 +103,21 @@ void setup() {
   timerAlarmWrite(battery_timer, 1000000 * 60, true);
   timerAlarmEnable(battery_timer);
 
+  // Print the XTAL crystal frequency
+  Serial.print("XTAL Crystal Frequency: ");
+  Serial.print(getXtalFrequencyMhz());
+  Serial.println(" MHz");
+
+  // Print the CPU frequency
+  Serial.print("CPU Frequency: ");
+  Serial.print(getCpuFrequencyMhz());
+  Serial.println(" MHz");
+
+  // Print the APB bus frequency
+  Serial.print("APB Bus Frequency: ");
+  Serial.print(getApbFrequency());
+  Serial.println(" Hz");
+
   Serial.println("Setup complete.");
 }
 
