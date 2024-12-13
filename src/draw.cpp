@@ -90,15 +90,8 @@ void draw_speed(float speed) {
   int16_t tbx, tby; uint16_t tbw, tbh;
   display.getTextBounds(speed_r, 0, 0, &tbx, &tby, &tbw, &tbh);
 
-  int16_t x = display.width() - tbw - 90;
-  int16_t y = 220;
-
-  if (speed > 10) {
-    x = display.width() - tbw - 50;
-  }
-
-  // Serial.printf("%d %d %d %d", display.width(), tbx, tbw, x);
-  // Serial.println("");
+  int16_t x = (display.width() - tbw) / 2;
+  int16_t y = (display.height() + tbh) / 2;
 
   do {
     display.fillRect(padding / 2, padding, display.width() - padding, display.height() - 2 * padding, GxEPD_WHITE);
