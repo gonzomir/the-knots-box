@@ -15,6 +15,9 @@
 LV_FONT_DECLARE(lvgl_rethinksans_bold_16)
 LV_FONT_DECLARE(lvgl_rethinksans_bold_200)
 
+lv_obj_t *speed_screen = NULL;
+lv_obj_t *timer_screen = NULL;
+
 lv_obj_t *speed_label = NULL;
 lv_obj_t *status_label = NULL;
 lv_obj_t *time_label = NULL;
@@ -36,28 +39,33 @@ void setup_display_tft() {
 
 	bsp_display_lock(0);
 
-	lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0xFFFFFF), LV_PART_MAIN);
-	lv_obj_set_style_text_color(lv_scr_act(), lv_color_hex(0x000000), LV_PART_MAIN);
-	lv_obj_set_style_text_font(lv_scr_act(), &lvgl_rethinksans_bold_16, LV_PART_MAIN);
-	lv_obj_set_style_pad_left(lv_scr_act(), 0, LV_PART_MAIN);
-	lv_obj_set_style_pad_right(lv_scr_act(), 0, LV_PART_MAIN);
-	lv_obj_set_style_pad_top(lv_scr_act(), 0, LV_PART_MAIN);
-	lv_obj_set_style_pad_bottom(lv_scr_act(), 0, LV_PART_MAIN);
+	static lv_style_t style_screen;
+	lv_style_init(&style_screen);
 
-	lv_obj_set_scrollbar_mode(lv_scr_act(), LV_SCROLLBAR_MODE_OFF);
+	lv_style_set_bg_color(&style_screen, lv_color_hex(0xFFFFFF));
+	lv_style_set_text_color(&style_screen, lv_color_hex(0x000000));
+	lv_style_set_text_font(&style_screen, &lvgl_rethinksans_bold_16);
+	lv_style_set_pad_left(&style_screen, 0);
+	lv_style_set_pad_right(&style_screen, 0);
+	lv_style_set_pad_top(&style_screen, 0);
+	lv_style_set_pad_bottom(&style_screen, 0);
 
-	lv_obj_t * container = lv_obj_create(lv_scr_act());
-	lv_obj_set_size(container, LCD_QSPI_V_RES, LCD_QSPI_H_RES);
-	lv_obj_align_to(container, lv_scr_act(), LV_ALIGN_TOP_LEFT, 0, 0);
-	lv_obj_set_flex_flow(container, LV_FLEX_FLOW_COLUMN);
-	lv_obj_set_flex_align(container, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-	lv_obj_set_style_pad_left(container, 0, LV_PART_MAIN);
-	lv_obj_set_style_pad_right(container, 0, LV_PART_MAIN);
-	lv_obj_set_style_pad_top(container, 0, LV_PART_MAIN);
-	lv_obj_set_style_pad_bottom(container, 0, LV_PART_MAIN);
-	lv_obj_set_scrollbar_mode(container, LV_SCROLLBAR_MODE_OFF);
+	speed_screen = lv_obj_create(NULL);
+	lv_obj_add_style(speed_screen, &style_screen, 0);
+	lv_obj_set_scrollbar_mode(speed_screen, LV_SCROLLBAR_MODE_OFF);
 
-	lv_obj_t * top_bar = lv_obj_create(container);
+	lv_obj_set_flex_flow(speed_screen, LV_FLEX_FLOW_COLUMN);
+	lv_obj_set_flex_align(speed_screen, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+
+	speed_label = lv_label_create(speed_screen);
+	lv_obj_align(speed_label, LV_ALIGN_CENTER, 0, 0);
+	lv_obj_set_style_text_font(speed_label, &lvgl_rethinksans_bold_200, LV_PART_MAIN);
+	lv_obj_set_style_text_color(speed_label, lv_color_hex(0x000000), LV_PART_MAIN);
+
+	lv_scr_load(speed_screen);
+
+
+	lv_obj_t * top_bar = lv_obj_create(lv_layer_top());
 	lv_obj_set_size(top_bar, LCD_QSPI_V_RES, 40);
 	lv_obj_align(top_bar, LV_ALIGN_TOP_MID, 0, 5);
 	lv_obj_set_flex_flow(top_bar, LV_FLEX_FLOW_ROW);
@@ -74,12 +82,7 @@ void setup_display_tft() {
 	battery_label = lv_label_create(top_bar);
 	lv_obj_align(battery_label, LV_ALIGN_OUT_RIGHT_MID, 0, 0);
 
-	speed_label = lv_label_create(container);
-	lv_obj_align(speed_label, LV_ALIGN_CENTER, 0, 0);
-	lv_obj_set_style_text_font(speed_label, &lvgl_rethinksans_bold_200, LV_PART_MAIN);
-	lv_obj_set_style_text_color(speed_label, lv_color_hex(0x000000), LV_PART_MAIN);
-
-	lv_obj_t * bottom_bar = lv_obj_create(container);
+	lv_obj_t * bottom_bar = lv_obj_create(lv_layer_top());
 	lv_obj_set_size(bottom_bar, LCD_QSPI_V_RES, 40);
 	lv_obj_align(bottom_bar, LV_ALIGN_BOTTOM_MID, 0, 5);
 	lv_obj_set_flex_flow(bottom_bar, LV_FLEX_FLOW_ROW);
