@@ -19,6 +19,8 @@ lv_obj_t *speed_screen = NULL;
 lv_obj_t *timer_screen = NULL;
 
 lv_obj_t *speed_label = NULL;
+lv_obj_t *timer_label = NULL;
+
 lv_obj_t *status_label = NULL;
 lv_obj_t *time_label = NULL;
 lv_obj_t *battery_label = NULL;
@@ -50,8 +52,14 @@ void setup_display_tft() {
 	lv_style_set_pad_top(&style_screen, 0);
 	lv_style_set_pad_bottom(&style_screen, 0);
 
+	static lv_style_t style_big_label;
+	lv_style_init(&style_big_label);
+
+	lv_style_set_text_font(&style_big_label, &lvgl_rethinksans_bold_200);
+	lv_style_set_text_color(&style_big_label, lv_color_hex(0x000000));
+
 	speed_screen = lv_obj_create(NULL);
-	lv_obj_add_style(speed_screen, &style_screen, 0);
+	lv_obj_add_style(speed_screen, &style_screen, LV_PART_MAIN);
 	lv_obj_set_scrollbar_mode(speed_screen, LV_SCROLLBAR_MODE_OFF);
 
 	lv_obj_set_flex_flow(speed_screen, LV_FLEX_FLOW_COLUMN);
@@ -59,11 +67,24 @@ void setup_display_tft() {
 
 	speed_label = lv_label_create(speed_screen);
 	lv_obj_align(speed_label, LV_ALIGN_CENTER, 0, 0);
-	lv_obj_set_style_text_font(speed_label, &lvgl_rethinksans_bold_200, LV_PART_MAIN);
-	lv_obj_set_style_text_color(speed_label, lv_color_hex(0x000000), LV_PART_MAIN);
+	lv_obj_add_style(speed_label, &style_big_label, LV_PART_MAIN);
 
 	lv_scr_load(speed_screen);
 
+	timer_screen = lv_obj_create(NULL);
+	lv_obj_add_style(timer_screen, &style_screen, LV_PART_MAIN);
+	lv_obj_set_scrollbar_mode(timer_screen, LV_SCROLLBAR_MODE_OFF);
+
+	lv_obj_set_flex_flow(timer_screen, LV_FLEX_FLOW_COLUMN);
+	lv_obj_set_flex_align(timer_screen, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+
+	timer_label = lv_label_create(timer_screen);
+	lv_obj_align(timer_label, LV_ALIGN_CENTER, 0, 0);
+	lv_obj_add_style(timer_label, &style_big_label, LV_PART_MAIN);
+	draw_start_timer_tft(300);
+
+	lv_obj_add_event_cb(speed_screen, screen_event_cb, LV_EVENT_ALL, NULL);
+	lv_obj_add_event_cb(timer_screen, screen_event_cb, LV_EVENT_ALL, NULL);
 
 	lv_obj_t * top_bar = lv_obj_create(lv_layer_top());
 	lv_obj_set_size(top_bar, LCD_QSPI_V_RES, 40);
@@ -198,4 +219,51 @@ void draw_units_tft(String text) {
 	bsp_display_lock(0);
 	lv_label_set_text(units_label, text.c_str());
 	bsp_display_unlock();
+}
+
+/**
+ * Draw start timer.
+ *
+ * @param seconds
+ */
+void draw_start_timer_tft(int seconds) {
+	int minutes;
+	minutes = seconds / 60;
+	seconds = seconds % 60;
+
+	bsp_display_lock(0);
+	lv_label_set_text_fmt(timer_label, "%d:%02d", minutes, seconds);
+	bsp_display_unlock();
+}
+
+/**
+ * Guesture event handler.
+ *
+ * @param lv_event_t e Event object.
+ */
+void screen_event_cb(lv_event_t * e) {
+	if (lv_event_get_code(e) != LV_EVENT_GESTURE) {
+		return;
+	}
+
+	lv_dir_t direction = lv_indev_get_gesture_dir(lv_indev_get_act());
+
+	switch (direction) {
+		case LV_DIR_LEFT:
+			if (lv_scr_act() == speed_screen) {
+				lv_scr_load_anim(timer_screen, LV_SCR_LOAD_ANIM_MOVE_LEFT, 200, 0, false);
+			} else {
+				lv_scr_load_anim(speed_screen, LV_SCR_LOAD_ANIM_MOVE_LEFT, 200, 0, false);
+			}
+			break;
+
+		case LV_DIR_RIGHT:
+			if (lv_scr_act() == speed_screen) {
+				lv_scr_load_anim(timer_screen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, false);
+			} else {
+				lv_scr_load_anim(speed_screen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, false);
+			}
+			break;
+
+	}
 }
