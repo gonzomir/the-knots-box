@@ -159,7 +159,8 @@ void loop() {
               int minutes = atoi(gps_time.substr(2, 2).c_str());
               int seconds = atoi(gps_time.substr(4, 2).c_str());
 
-              // Clear display every 5 minutes.
+              // Clear eInk display every 5 minutes.
+              #ifdef EINK
               if (minutes % 5 == 0 && seconds == 0) {
                 clear_display();
                 draw_top_bar();
@@ -168,6 +169,7 @@ void loop() {
                 battery_read = true;
                 last_battery_percents = 0;
               }
+              #endif
 
               draw_time(hours, minutes, seconds);
             }
