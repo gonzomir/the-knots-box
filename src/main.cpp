@@ -3,6 +3,8 @@
 #include <string>
 #include <nmeaparser.h>
 
+#include <Ticker.h>
+
 #include "esp_bt.h"
 #include "esp_wifi.h"
 
@@ -11,16 +13,26 @@
 #include "draw.h"
 
 NMEAParser parser;
+
 bool should_sleep = false;
 bool gps_is_ready = false;
 bool do_read_gnss = false;
-int  last_fix = 0;
+bool do_start_timer = false;
+bool do_update_start_timer = false;
+
+int last_fix = 0;
 String last_status = "";
 float last_speed = 0.0;
 bool battery_read = true;
 int last_battery_percents = 0;
 
+int start_timer_time = 300;
+int start_timer_start = 0;
+bool start_timer_started = false;
+
 hw_timer_t *battery_timer = NULL;
+
+Ticker start_timer_ticker;
 
 /**
  * On/off button unterrupt handler.
@@ -52,12 +64,18 @@ void go_to_sleep() {
 
 void IRAM_ATTR read_gnss() {
   ets_printf("PPS triggered\n");
-  do_read_gnss = true;
+  do_read_gnss = !do_start_timer;
   last_fix = millis();
 }
 
 void IRAM_ATTR read_battery() {
   battery_read = true;
+}
+
+void IRAM_ATTR update_start_timer() {
+  ets_printf("Start timer triggered, passed %d\n", millis() / 1000 - start_timer_start);
+  start_timer_time = 300 - (millis() / 1000 - start_timer_start);
+  do_update_start_timer = true;
 }
 
 /**
@@ -219,7 +237,7 @@ void loop() {
         Serial.println("Failed parsing NMEA sentence.");
       }
     }
-  } else {
+  } else if (!do_start_timer) {
     int now = millis();
     if (now > last_fix + 30 * 1000) {
       String status = "Waiting for GPS...";
@@ -231,6 +249,29 @@ void loop() {
         draw_speed(0.0);
         last_speed = 0.0;
       }
+    }
+  }
+
+  if (do_start_timer) {
+    if (!start_timer_started) {
+      ets_printf("Initiate start timer...\n");
+      start_timer_time = 300;
+      start_timer_start = millis() / 1000;
+      start_timer_ticker.attach(1, update_start_timer);
+      start_timer_started = true;
+    }
+
+    if (do_update_start_timer) {
+      ets_printf("Update start timer, time is %d sec.\n", start_timer_time);
+      draw_start_timer(start_timer_time);
+      do_update_start_timer = false;
+    }
+
+    if (start_timer_time <= 0) {
+      ets_printf("End start timer at %d sec.\n", start_timer_time);
+      start_timer_ticker.detach();
+      do_start_timer = false;
+      start_timer_started = false;
     }
   }
 

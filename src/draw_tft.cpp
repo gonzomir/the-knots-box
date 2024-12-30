@@ -57,6 +57,11 @@ void setup_display_tft() {
 
 	lv_style_set_text_font(&style_big_label, &lvgl_rethinksans_bold_200);
 	lv_style_set_text_color(&style_big_label, lv_color_hex(0x000000));
+	lv_style_set_text_line_space(&style_big_label, 0);
+	lv_style_set_pad_left(&style_big_label, 0);
+	lv_style_set_pad_right(&style_big_label, 0);
+	lv_style_set_pad_top(&style_big_label, 0);
+	lv_style_set_pad_bottom(&style_big_label, 0);
 
 	speed_screen = lv_obj_create(NULL);
 	lv_obj_add_style(speed_screen, &style_screen, LV_PART_MAIN);
@@ -252,17 +257,23 @@ void screen_event_cb(lv_event_t * e) {
 		case LV_DIR_LEFT:
 			if (lv_scr_act() == speed_screen) {
 				lv_scr_load_anim(timer_screen, LV_SCR_LOAD_ANIM_MOVE_LEFT, 200, 0, false);
+				do_start_timer = true;
 			} else {
 				lv_scr_load_anim(speed_screen, LV_SCR_LOAD_ANIM_MOVE_LEFT, 200, 0, false);
+				do_start_timer = false;
 			}
+			start_timer_started = false;
 			break;
 
 		case LV_DIR_RIGHT:
 			if (lv_scr_act() == speed_screen) {
 				lv_scr_load_anim(timer_screen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, false);
+				do_start_timer = true;
 			} else {
 				lv_scr_load_anim(speed_screen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, false);
+				do_start_timer = false;
 			}
+			start_timer_started = false;
 			break;
 
 	}
