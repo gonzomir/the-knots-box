@@ -59,6 +59,17 @@ void draw_speed(float speed) {
 }
 
 /**
+ * Draw start timer.
+ *
+ * @param start_time
+ */
+void draw_start_timer(int start_time) {
+	#ifdef TFT
+	draw_start_timer_tft(start_time);
+	#endif
+}
+
+/**
  * Draw top status bar.
  *
  * @param text

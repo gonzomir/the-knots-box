@@ -42,6 +42,13 @@ void clear_display();
 void draw_speed(float speed);
 
 /**
+ * Draw start timer.
+ *
+ * @param start_time
+ */
+void draw_start_timer(int start_time);
+
+/**
  * Draw top status bar.
  */
 void draw_top_bar();

@@ -87,3 +87,17 @@ void draw_units_tft(String text);
  * @param partial Partial or full screen draw.
  */
 void draw_box_tft(uint16_t x, uint16_t y, uint16_t w, uint16_t h, bool partial);
+
+/**
+ * Draw start timer.
+ *
+ * @param seconds
+ */
+void draw_start_timer_tft(int seconds);
+
+/**
+ * Guesture event handler.
+ *
+ * @param lv_event_t e Event object.
+ */
+void screen_event_cb(lv_event_t * e);
