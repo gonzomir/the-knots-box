@@ -97,6 +97,7 @@ void setup() {
   draw_bottom_bar();
   draw_units("SOG, Kn");
   draw_speed(0.0);
+  draw_time(0, 0 ,0);
 
   draw_status("Waiting for GPS...");
 
@@ -105,10 +106,9 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(POWER_BTN), button_pressed, FALLING);
   attachInterrupt(digitalPinToInterrupt(GNSS_PPS), read_gnss, RISING);
 
-  battery_timer = timerBegin(0, 80, true);
-  timerAttachInterrupt(battery_timer, &read_battery, true);
-  timerAlarmWrite(battery_timer, 1000000 * 60, true);
-  timerAlarmEnable(battery_timer);
+  battery_timer = timerBegin(1);
+  timerAttachInterrupt(battery_timer, &read_battery);
+  timerAlarm(battery_timer, 1000000 * 60, true, 0);
 
   // Print the XTAL crystal frequency
   Serial.print("XTAL Crystal Frequency: ");

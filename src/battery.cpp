@@ -4,6 +4,8 @@
 #include "esp_adc_cal.h"
 #include "soc/adc_channel.h"
 
+#include "config.h"
+
 // This fixes compile error, see https://github.com/esphome/issues/issues/2982.
 #undef ADC_WIDTH_BIT_DEFAULT
 #define ADC_WIDTH_BIT_DEFAULT   ((adc_bits_width_t) ((int)ADC_WIDTH_MAX-1))
@@ -18,7 +20,7 @@ void calibrate_adc() {
 
 	ret = esp_adc_cal_check_efuse(ESP_ADC_CAL_VAL_EFUSE_VREF);
 	if (ret == ESP_OK) {
-		esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_11, ADC_WIDTH_BIT_DEFAULT, 0, &adc_chars);
+		esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_12, ADC_WIDTH_BIT_DEFAULT, 0, &adc_chars);
 	}
 }
 
@@ -28,9 +30,9 @@ void calibrate_adc() {
  * @return float Battery voltage.
  */
 float get_battery_voltage() {
-	adc1_config_channel_atten(ADC1_GPIO35_CHANNEL, ADC_ATTEN_DB_11);
+	adc1_config_channel_atten(BATTERY_STATUS_ADC_CHANNEL, ADC_ATTEN_DB_12);
 
-	uint32_t raw = adc1_get_raw(ADC1_GPIO35_CHANNEL);
+	uint32_t raw = adc1_get_raw(BATTERY_STATUS_ADC_CHANNEL);
 	float voltage = esp_adc_cal_raw_to_voltage(raw, &adc_chars) / 1000.0;
 
 	/**
@@ -39,7 +41,13 @@ float get_battery_voltage() {
 	 * multiplier is (93 + 100) / 93 = 2.08, but that gives results higher than the real voltage.
 	 * Empirically 2.04 gives results closer to real life (or maybe the GPIO impedance is not 1.3Mohms).
 	 */
+	#ifdef EINK
 	return voltage * 2.04;
+	#endif
+
+	#ifdef TFT
+	return voltage * 1.35;
+	#endif
 }
 
 /**
