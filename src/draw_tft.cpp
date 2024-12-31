@@ -1,8 +1,6 @@
 #include <cmath>
 #include <Arduino.h>
 
-#include "config.h"
-
 #include "lvgl.h"
 
 #include "display.h"
@@ -86,6 +84,9 @@ void setup_display_tft() {
 	timer_label = lv_label_create(timer_screen);
 	lv_obj_align(timer_label, LV_ALIGN_CENTER, 0, 0);
 	lv_obj_add_style(timer_label, &style_big_label, LV_PART_MAIN);
+	lv_obj_add_flag(timer_label, LV_OBJ_FLAG_CLICKABLE);
+	lv_obj_add_flag(timer_label, LV_OBJ_FLAG_EVENT_BUBBLE);
+
 	draw_start_timer_tft(300);
 
 	lv_obj_add_event_cb(speed_screen, screen_event_cb, LV_EVENT_ALL, NULL);
@@ -247,6 +248,16 @@ void draw_start_timer_tft(int seconds) {
  * @param lv_event_t e Event object.
  */
 void screen_event_cb(lv_event_t * e) {
+	if (lv_event_get_code(e) == LV_EVENT_SHORT_CLICKED) {
+		LV_LOG_USER("GOT CLICK EVENT");
+		lv_obj_t * target = lv_event_get_target(e);
+		if (target == timer_label) {
+			LV_LOG_USER("GOT CLICK ON TIMER LABEL");
+			do_start_timer = true;
+			return;
+		}
+	}
+
 	if (lv_event_get_code(e) != LV_EVENT_GESTURE) {
 		return;
 	}
@@ -257,22 +268,26 @@ void screen_event_cb(lv_event_t * e) {
 		case LV_DIR_LEFT:
 			if (lv_scr_act() == speed_screen) {
 				lv_scr_load_anim(timer_screen, LV_SCR_LOAD_ANIM_MOVE_LEFT, 200, 0, false);
-				do_start_timer = true;
+				display_mode = tkb_mode::start;
+				draw_start_timer_tft(300);
 			} else {
 				lv_scr_load_anim(speed_screen, LV_SCR_LOAD_ANIM_MOVE_LEFT, 200, 0, false);
-				do_start_timer = false;
+				display_mode = tkb_mode::speed;
 			}
+			do_start_timer = false;
 			start_timer_started = false;
 			break;
 
 		case LV_DIR_RIGHT:
 			if (lv_scr_act() == speed_screen) {
 				lv_scr_load_anim(timer_screen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, false);
-				do_start_timer = true;
+				display_mode = tkb_mode::start;
+				draw_start_timer_tft(300);
 			} else {
 				lv_scr_load_anim(speed_screen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, false);
-				do_start_timer = false;
+				display_mode = tkb_mode::speed;
 			}
+			do_start_timer = false;
 			start_timer_started = false;
 			break;
 

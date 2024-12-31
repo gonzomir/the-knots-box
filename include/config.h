@@ -74,10 +74,11 @@
 #define PIN_NUM_QSPI_TOUCH_INT  (-1)
 #endif
 
-#define LV_LVGL_H_INCLUDE_SIMPLE
+enum tkb_mode { speed, start };
 
 extern bool should_sleep;
 extern bool gps_is_ready;
 extern bool do_read_gnss;
 extern bool do_start_timer;
+extern tkb_mode display_mode;
 extern bool start_timer_started;

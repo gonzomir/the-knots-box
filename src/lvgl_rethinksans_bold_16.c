@@ -3,8 +3,6 @@
  * Bpp: 4
  * Opts: --bpp 4 --size 16 --no-compress --font RethinkSans-Bold.ttf --range 32-127 --format lvgl -o lvgl_rethinksans_bold_16.c
  ******************************************************************************/
-#include "config.h"
-
 #ifdef LV_LVGL_H_INCLUDE_SIMPLE
 #include "lvgl.h"
 #else
