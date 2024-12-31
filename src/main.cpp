@@ -3,6 +3,9 @@
 #include <string>
 #include <nmeaparser.h>
 
+#include "esp_bt.h"
+#include "esp_wifi.h"
+
 #include "config.h"
 #include "battery.h"
 #include "draw.h"
@@ -64,6 +67,10 @@ void setup() {
   should_sleep = false;
   esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL);
 
+  // Disable WiFi and Bluetooth.
+  esp_bt_controller_disable();
+  esp_wifi_stop();
+
   // Disable the hold on output pin states.
   gpio_deep_sleep_hold_dis();
   gpio_hold_dis(GNSS_EN_GPIO);
@@ -102,6 +109,21 @@ void setup() {
   timerAttachInterrupt(battery_timer, &read_battery, true);
   timerAlarmWrite(battery_timer, 1000000 * 60, true);
   timerAlarmEnable(battery_timer);
+
+  // Print the XTAL crystal frequency
+  Serial.print("XTAL Crystal Frequency: ");
+  Serial.print(getXtalFrequencyMhz());
+  Serial.println(" MHz");
+
+  // Print the CPU frequency
+  Serial.print("CPU Frequency: ");
+  Serial.print(getCpuFrequencyMhz());
+  Serial.println(" MHz");
+
+  // Print the APB bus frequency
+  Serial.print("APB Bus Frequency: ");
+  Serial.print(getApbFrequency());
+  Serial.println(" Hz");
 
   Serial.println("Setup complete.");
 }
