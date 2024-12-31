@@ -13,7 +13,7 @@
 #include "draw_tft.h"
 
 LV_FONT_DECLARE(lvgl_rethinksans_bold_16)
-LV_FONT_DECLARE(lvgl_rethinksans_bold_150)
+LV_FONT_DECLARE(lvgl_rethinksans_bold_200)
 
 lv_obj_t *speed_label = NULL;
 lv_obj_t *status_label = NULL;
@@ -76,7 +76,7 @@ void setup_display_tft() {
 
 	speed_label = lv_label_create(container);
 	lv_obj_align(speed_label, LV_ALIGN_CENTER, 0, 0);
-	lv_obj_set_style_text_font(speed_label, &lvgl_rethinksans_bold_150, LV_PART_MAIN);
+	lv_obj_set_style_text_font(speed_label, &lvgl_rethinksans_bold_200, LV_PART_MAIN);
 	lv_obj_set_style_text_color(speed_label, lv_color_hex(0x000000), LV_PART_MAIN);
 
 	lv_obj_t * bottom_bar = lv_obj_create(container);
