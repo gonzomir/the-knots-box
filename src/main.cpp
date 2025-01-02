@@ -34,6 +34,7 @@ bool start_timer_started = false;
 
 hw_timer_t *battery_timer = NULL;
 
+Ticker battery_ticker;
 Ticker start_timer_ticker;
 
 /**
@@ -71,6 +72,7 @@ void IRAM_ATTR read_gnss() {
 }
 
 void IRAM_ATTR read_battery() {
+	ets_printf("Battery timer triggered\n");
 	battery_read = true;
 }
 
@@ -257,9 +259,15 @@ void setup() {
 	attachInterrupt(digitalPinToInterrupt(POWER_BTN), button_pressed, FALLING);
 	attachInterrupt(digitalPinToInterrupt(GNSS_PPS), read_gnss, RISING);
 
+	#ifdef EINK
 	battery_timer = timerBegin(1);
 	timerAttachInterrupt(battery_timer, &read_battery);
 	timerAlarm(battery_timer, 1000000 * 60, true, 0);
+	#endif
+
+	#ifdef TFT
+	battery_ticker.attach(60, read_battery);
+	#endif
 
 	// Print the XTAL crystal frequency
 	ets_printf("XTAL Crystal Frequency: %d MHz\n", getXtalFrequencyMhz());
@@ -294,6 +302,7 @@ void loop() {
 
 	if (battery_read) {
 		battery_read = false;
+
 		float voltage = get_battery_voltage();
 		int battery_percents = get_battery_percents(voltage);
 
