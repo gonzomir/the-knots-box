@@ -11,6 +11,7 @@
 #define ADC_WIDTH_BIT_DEFAULT   ((adc_bits_width_t) ((int)ADC_WIDTH_MAX-1))
 
 static esp_adc_cal_characteristics_t adc_chars;
+static bool has_calibration;
 
 /**
  * Calibrate the ADC.

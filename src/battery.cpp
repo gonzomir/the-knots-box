@@ -16,8 +16,11 @@
 void calibrate_adc() {
 	esp_err_t ret;
 
+	has_calibration = false;
+
 	ret = esp_adc_cal_check_efuse(ESP_ADC_CAL_VAL_EFUSE_VREF);
 	if (ret == ESP_OK) {
+		has_calibration = true;
 		esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_12, ADC_WIDTH_BIT_DEFAULT, 0, &adc_chars);
 	}
 }
@@ -31,7 +34,15 @@ float get_battery_voltage() {
 	adc1_config_channel_atten(BATTERY_STATUS_ADC_CHANNEL, ADC_ATTEN_DB_12);
 
 	uint32_t raw = adc1_get_raw(BATTERY_STATUS_ADC_CHANNEL);
-	float voltage = esp_adc_cal_raw_to_voltage(raw, &adc_chars) / 1000.0;
+	ets_printf("Battery raw reading: %d\n", raw);
+
+	float voltage;
+	if (has_calibration) {
+		voltage = esp_adc_cal_raw_to_voltage(raw, &adc_chars) / 1000.0;
+	}
+	else {
+		voltage = raw * 3.3/4096.0;
+	}
 
 	/**
 	 * The voltage devider is 100k to 100k, so the multiplier is (100 + 100) / 100 = 2.
@@ -43,8 +54,14 @@ float get_battery_voltage() {
 	return voltage * 2.04;
 	#endif
 
+	/**
+	 * The voltage devider is 33k to 100k, so the multiplier is (100 + 33) / 100 = 1.33.
+	 * If we take into account ESP32's GPIO impedance (1.3Mohms), the resulting
+	 * multiplier is (93 + 33) / 93 = 1.36. But comparing ADC reading to measured
+	 * battery voltage gives 1.76 as a multiplier.
+	 */
 	#ifdef TFT
-	return voltage * 1.35;
+	return voltage * 1.76;
 	#endif
 }
 
