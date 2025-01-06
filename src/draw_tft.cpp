@@ -269,10 +269,12 @@ void screen_event_cb(lv_event_t * e) {
 			if (lv_scr_act() == speed_screen) {
 				lv_scr_load_anim(timer_screen, LV_SCR_LOAD_ANIM_MOVE_LEFT, 200, 0, false);
 				display_mode = tkb_mode::start;
+				draw_units_tft("Time to start");
 				draw_start_timer_tft(300);
 			} else {
 				lv_scr_load_anim(speed_screen, LV_SCR_LOAD_ANIM_MOVE_LEFT, 200, 0, false);
 				display_mode = tkb_mode::speed;
+				draw_units_tft("SOG, Kn");
 			}
 			do_start_timer = false;
 			start_timer_started = false;
@@ -282,10 +284,12 @@ void screen_event_cb(lv_event_t * e) {
 			if (lv_scr_act() == speed_screen) {
 				lv_scr_load_anim(timer_screen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, false);
 				display_mode = tkb_mode::start;
+				draw_units_tft("Time to start");
 				draw_start_timer_tft(300);
 			} else {
 				lv_scr_load_anim(speed_screen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, false);
 				display_mode = tkb_mode::speed;
+				draw_units_tft("SOG, Kn");
 			}
 			do_start_timer = false;
 			start_timer_started = false;
