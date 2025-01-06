@@ -134,6 +134,7 @@ void setup_display_tft() {
  */
 void power_off_display_tft() {
 	bsp_display_backlight_off();
+	lvgl_port_deinit();
 }
 
 /**
