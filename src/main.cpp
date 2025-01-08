@@ -34,6 +34,7 @@ bool start_timer_started = false;
 
 hw_timer_t *battery_timer = NULL;
 
+Ticker battery_ticker;
 Ticker start_timer_ticker;
 
 /**
@@ -59,7 +60,7 @@ void go_to_sleep() {
 	gpio_hold_en(GNSS_EN_GPIO);
 	gpio_deep_sleep_hold_en();
 
-	Serial.println("Going to sleep.");
+	ets_printf("Going to sleep.\n");
 	esp_sleep_enable_ext0_wakeup(POWER_BTN_GPIO, 1);
 	esp_deep_sleep_start();
 }
@@ -71,6 +72,7 @@ void IRAM_ATTR read_gnss() {
 }
 
 void IRAM_ATTR read_battery() {
+	ets_printf("Battery timer triggered\n");
 	battery_read = true;
 }
 
@@ -90,7 +92,7 @@ void do_speed() {
 			data = Serial2.readStringUntil('\n');
 			// Remove trailing newline.
 			data.remove(data.length() -1);
-			//Serial.println(data);
+			//ets_printf("%s\n", data);
 
 			const char * str = data.c_str();
 			if (parser.dispatch(str)) {
@@ -160,7 +162,7 @@ void do_speed() {
 				}
 
 			} else {
-				Serial.println("Failed parsing NMEA sentence.");
+				ets_printf("Failed parsing NMEA sentence.\n");
 			}
 		}
 	} else {
@@ -257,26 +259,26 @@ void setup() {
 	attachInterrupt(digitalPinToInterrupt(POWER_BTN), button_pressed, FALLING);
 	attachInterrupt(digitalPinToInterrupt(GNSS_PPS), read_gnss, RISING);
 
+	#ifdef EINK
 	battery_timer = timerBegin(1);
 	timerAttachInterrupt(battery_timer, &read_battery);
 	timerAlarm(battery_timer, 1000000 * 60, true, 0);
+	#endif
+
+	#ifdef TFT
+	battery_ticker.attach(60, read_battery);
+	#endif
 
 	// Print the XTAL crystal frequency
-	Serial.print("XTAL Crystal Frequency: ");
-	Serial.print(getXtalFrequencyMhz());
-	Serial.println(" MHz");
+	ets_printf("XTAL Crystal Frequency: %d MHz\n", getXtalFrequencyMhz());
 
 	// Print the CPU frequency
-	Serial.print("CPU Frequency: ");
-	Serial.print(getCpuFrequencyMhz());
-	Serial.println(" MHz");
+	ets_printf("CPU Frequency: %d MHz\n", getCpuFrequencyMhz());
 
 	// Print the APB bus frequency
-	Serial.print("APB Bus Frequency: ");
-	Serial.print(getApbFrequency());
-	Serial.println(" Hz");
+	ets_printf("APB Bus Frequency: %d MHz\n", getApbFrequency());
 
-	Serial.println("Setup complete.");
+	ets_printf("Setup complete.\n");
 }
 
 /**
@@ -300,10 +302,14 @@ void loop() {
 
 	if (battery_read) {
 		battery_read = false;
+
 		float voltage = get_battery_voltage();
 		int battery_percents = get_battery_percents(voltage);
-		//Serial.println(voltage);
-		//Serial.println(battery_percents);
+
+		char buffer[4];
+		sprintf(buffer, "%0.2f", voltage);
+		ets_printf("Battery voltage: %s V\n", buffer);
+		ets_printf("Battery capacity: %d%%\n", battery_percents);
 
 		if (battery_percents < 2.0) {
 			go_to_sleep();
