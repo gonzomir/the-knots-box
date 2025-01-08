@@ -10,9 +10,6 @@
 
 #include "draw_tft.h"
 
-LV_FONT_DECLARE(lvgl_rethinksans_bold_16)
-LV_FONT_DECLARE(lvgl_rethinksans_bold_200)
-
 lv_obj_t *speed_screen = NULL;
 lv_obj_t *timer_screen = NULL;
 
@@ -134,6 +131,8 @@ void setup_display_tft() {
  */
 void power_off_display_tft() {
 	bsp_display_backlight_off();
+	lvgl_port_deinit();
+	bsp_display_off();
 }
 
 /**
