@@ -537,3 +537,8 @@ void bsp_display_unlock(void)
 {
     lvgl_port_unlock();
 }
+
+void bsp_display_off()
+{
+    esp_lcd_panel_disp_on_off(panel_handle, false);
+}

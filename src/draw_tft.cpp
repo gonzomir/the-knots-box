@@ -10,9 +10,6 @@
 
 #include "draw_tft.h"
 
-LV_FONT_DECLARE(lvgl_rethinksans_bold_16)
-LV_FONT_DECLARE(lvgl_rethinksans_bold_200)
-
 lv_obj_t *speed_screen = NULL;
 lv_obj_t *timer_screen = NULL;
 
@@ -39,11 +36,14 @@ void setup_display_tft() {
 
 	bsp_display_lock(0);
 
+	lv_color_t background_color = lv_color_hex(0x000000);
+	lv_color_t text_color = lv_color_hex(0xFFFFFF);
+
 	static lv_style_t style_screen;
 	lv_style_init(&style_screen);
 
-	lv_style_set_bg_color(&style_screen, lv_color_hex(0xFFFFFF));
-	lv_style_set_text_color(&style_screen, lv_color_hex(0x000000));
+	lv_style_set_bg_color(&style_screen, background_color);
+	lv_style_set_text_color(&style_screen, text_color);
 	lv_style_set_text_font(&style_screen, &lvgl_rethinksans_bold_16);
 	lv_style_set_pad_left(&style_screen, 0);
 	lv_style_set_pad_right(&style_screen, 0);
@@ -54,7 +54,7 @@ void setup_display_tft() {
 	lv_style_init(&style_big_label);
 
 	lv_style_set_text_font(&style_big_label, &lvgl_rethinksans_bold_200);
-	lv_style_set_text_color(&style_big_label, lv_color_hex(0x000000));
+	lv_style_set_text_color(&style_big_label, text_color);
 	lv_style_set_text_line_space(&style_big_label, 0);
 	lv_style_set_pad_left(&style_big_label, 0);
 	lv_style_set_pad_right(&style_big_label, 0);
@@ -97,8 +97,10 @@ void setup_display_tft() {
 	lv_obj_align(top_bar, LV_ALIGN_TOP_MID, 0, 5);
 	lv_obj_set_flex_flow(top_bar, LV_FLEX_FLOW_ROW);
 	lv_obj_set_flex_align(top_bar, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+	lv_obj_set_style_bg_color(top_bar, background_color, LV_PART_MAIN);
+	lv_obj_set_style_text_color(top_bar, text_color, LV_PART_MAIN);
 	lv_obj_set_style_border_width(top_bar, 1, LV_PART_MAIN);
-	lv_obj_set_style_border_color(top_bar, lv_color_black(), LV_PART_MAIN);
+	lv_obj_set_style_border_color(top_bar, text_color, LV_PART_MAIN);
 	lv_obj_set_style_border_side(top_bar, LV_BORDER_SIDE_BOTTOM, LV_PART_MAIN);
 	lv_obj_set_style_pad_left(top_bar, 20, LV_PART_MAIN);
 	lv_obj_set_style_pad_right(top_bar, 20, LV_PART_MAIN);
@@ -114,8 +116,10 @@ void setup_display_tft() {
 	lv_obj_align(bottom_bar, LV_ALIGN_BOTTOM_MID, 0, 5);
 	lv_obj_set_flex_flow(bottom_bar, LV_FLEX_FLOW_ROW);
 	lv_obj_set_flex_align(bottom_bar, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+	lv_obj_set_style_bg_color(bottom_bar, background_color, LV_PART_MAIN);
+	lv_obj_set_style_text_color(bottom_bar, text_color, LV_PART_MAIN);
 	lv_obj_set_style_border_width(bottom_bar, 1, LV_PART_MAIN);
-	lv_obj_set_style_border_color(bottom_bar, lv_color_black(), LV_PART_MAIN);
+	lv_obj_set_style_border_color(bottom_bar, text_color, LV_PART_MAIN);
 	lv_obj_set_style_border_side(bottom_bar, LV_BORDER_SIDE_TOP, LV_PART_MAIN);
 	lv_obj_set_style_pad_left(bottom_bar, 20, LV_PART_MAIN);
 	lv_obj_set_style_pad_right(bottom_bar, 20, LV_PART_MAIN);
@@ -134,6 +138,8 @@ void setup_display_tft() {
  */
 void power_off_display_tft() {
 	bsp_display_backlight_off();
+	lvgl_port_deinit();
+	bsp_display_off();
 }
 
 /**

@@ -116,6 +116,12 @@ bool bsp_display_lock(uint32_t timeout_ms);
  */
 void bsp_display_unlock(void);
 
+/**
+ * @brief Turn off the display panel
+ *
+ */
+void bsp_display_off();
+
 #ifdef __cplusplus
 }
 #endif
