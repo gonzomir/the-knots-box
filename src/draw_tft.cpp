@@ -2,6 +2,8 @@
 #include <Arduino.h>
 #include <Arduino_GFX_Library.h>
 
+#include <Ticker.h>
+
 #include "lvgl.h"
 
 //#include "lv_port.h"
@@ -31,6 +33,9 @@ lv_obj_t *time_label = NULL;
 lv_obj_t *battery_label = NULL;
 lv_obj_t *units_label = NULL;
 
+// Declare Ticker objects as global variables.
+Ticker lvgl_tick;
+
 /**
  * Flush display.
  *
@@ -51,15 +56,31 @@ void flush_display(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color
 	lv_disp_flush_ready(disp);
 }
 
-void flush_display_full_tft() {
+/**
+ * Call LVGL timr handler and flush display.
+ */
+void timer_handler_tft() {
 	lv_timer_handler();
 	gfx->flush();
 }
 
+/**
+ * Increment LVGL tick.
+ */
+void IRAM_ATTR tick_handler() {
+	lv_tick_inc(5);
+}
+
+/**
+ * Turn display backlight on.
+ */
 void display_backlight_on() {
 	digitalWrite(GFX_BL, HIGH);
 }
 
+/**
+ * Turn display backlight off.
+ */
 void display_backlight_off() {
 	digitalWrite(GFX_BL, LOW);
 }
@@ -68,7 +89,6 @@ void display_backlight_off() {
  * Setup the display.
  */
 void setup_display_tft() {
-
 	bus = new Arduino_ESP32QSPI(PIN_NUM_QSPI_CS, PIN_NUM_QSPI_PCLK, PIN_NUM_QSPI_DATA0, PIN_NUM_QSPI_DATA1, PIN_NUM_QSPI_DATA2, PIN_NUM_QSPI_DATA3);
 	g = new Arduino_NV3041A(bus, GFX_NOT_DEFINED /* RST */, 0 /* rotation */, true /* IPS */);
 	gfx = new Arduino_Canvas(480 /* width */, 272 /* height */, g);
@@ -112,6 +132,8 @@ void setup_display_tft() {
 	disp_drv.draw_buf = &draw_buf;
 
 	lv_disp_drv_register(&disp_drv);
+
+	lvgl_tick.attach_ms(5, tick_handler);
 
 	// Start drawing.
 	lv_color_t background_color = lv_color_hex(0x000000);

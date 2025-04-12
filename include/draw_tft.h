@@ -2,6 +2,8 @@
 #include <Arduino.h>
 #include <Arduino_GFX_Library.h>
 
+#include <Ticker.h>
+
 #include "config.h"
 
 #include "lvgl.h"
@@ -15,11 +17,6 @@
  * Setup the display.
  */
 void setup_display_tft();
-
-/**
- * Flush display.
- */
-void flush_display_full_tft();
 
 /**
  * Power off the display.
@@ -101,6 +98,7 @@ void draw_box_tft(uint16_t x, uint16_t y, uint16_t w, uint16_t h, bool partial);
  */
 void draw_start_timer_tft(int seconds);
 
+void timer_handler_tft();
 /**
  * Guesture event handler.
  *

@@ -285,11 +285,6 @@ void setup() {
  * Main loop.
  */
 void loop() {
-	// TODO: This is bettr to go in a task. Also we need to call lv_tick_inc() in a task.
-	#ifdef TFT
-	flush_display_full();
-	#endif
-
 	if (should_sleep) {
 		go_to_sleep();
 		return;
@@ -325,5 +320,8 @@ void loop() {
 			draw_battery_status(battery_percents);
 			last_battery_percents = battery_percents;
 		}
+
+	if (millis() % 5 == 0) {
+		timer_handler();
 	}
 }

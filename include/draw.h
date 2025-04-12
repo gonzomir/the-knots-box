@@ -25,11 +25,6 @@
 void setup_display();
 
 /**
- * Flush display.
- */
-void flush_display_full();
-
-/**
  * Power off the display.
  */
 void power_off_display();
@@ -108,3 +103,5 @@ void draw_units(String text);
  * @param partial Partial or full screen draw.
  */
 void draw_box(uint16_t x, uint16_t y, uint16_t w, uint16_t h, bool partial);
+
+void timer_handler();

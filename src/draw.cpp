@@ -21,12 +21,6 @@ void setup_display() {
 	#endif
 }
 
-void flush_display_full() {
-	#ifdef TFT
-	flush_display_full_tft();
-	#endif
-}
-
 /**
  * Power off the display.
  */
@@ -169,5 +163,11 @@ void draw_units(String text) {
 
 	#ifdef TFT
 	draw_units_tft(text);
+	#endif
+}
+
+void timer_handler() {
+	#ifdef TFT
+	timer_handler_tft();
 	#endif
 }
