@@ -1,19 +1,25 @@
 #include <cmath>
 #include <Arduino.h>
+#include <Arduino_GFX_Library.h>
 
 #include "config.h"
 
 #include "lvgl.h"
 
-#include "display.h"
-#include "esp_bsp.h"
 #include "lv_port.h"
 #include "lv_conf.h"
+
+#define CANVAS
 
 /**
  * Setup the display.
  */
 void setup_display_tft();
+
+/**
+ * Flush display.
+ */
+void flush_display_full_tft();
 
 /**
  * Power off the display.

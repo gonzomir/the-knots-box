@@ -285,6 +285,11 @@ void setup() {
  * Main loop.
  */
 void loop() {
+	// TODO: This is bettr to go in a task. Also we need to call lv_tick_inc() in a task.
+	#ifdef TFT
+	flush_display_full();
+	#endif
+
 	if (should_sleep) {
 		go_to_sleep();
 		return;

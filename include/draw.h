@@ -25,6 +25,11 @@
 void setup_display();
 
 /**
+ * Flush display.
+ */
+void flush_display_full();
+
+/**
  * Power off the display.
  */
 void power_off_display();

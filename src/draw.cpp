@@ -21,6 +21,12 @@ void setup_display() {
 	#endif
 }
 
+void flush_display_full() {
+	#ifdef TFT
+	flush_display_full_tft();
+	#endif
+}
+
 /**
  * Power off the display.
  */

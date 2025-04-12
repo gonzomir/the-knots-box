@@ -56,13 +56,15 @@
 #define DISPLAY_RST -1
 #define DISPLAY_BUSY -1
 
+#define GFX_BL 1
+
 #define LCD_QSPI_HOST           (SPI2_HOST)
-#define PIN_NUM_QSPI_CS         (GPIO_NUM_45)
-#define PIN_NUM_QSPI_PCLK       (GPIO_NUM_47)
-#define PIN_NUM_QSPI_DATA0      (GPIO_NUM_21)
-#define PIN_NUM_QSPI_DATA1      (GPIO_NUM_48)
-#define PIN_NUM_QSPI_DATA2      (GPIO_NUM_40)
-#define PIN_NUM_QSPI_DATA3      (GPIO_NUM_39)
+#define PIN_NUM_QSPI_CS 45
+#define PIN_NUM_QSPI_PCLK 47
+#define PIN_NUM_QSPI_DATA0 21
+#define PIN_NUM_QSPI_DATA1 48
+#define PIN_NUM_QSPI_DATA2 40
+#define PIN_NUM_QSPI_DATA3 39
 #define PIN_NUM_QSPI_RST        (GPIO_NUM_NC)
 #define PIN_NUM_QSPI_DC         (GPIO_NUM_8)
 #define PIN_NUM_QSPI_TE         (GPIO_NUM_38)
