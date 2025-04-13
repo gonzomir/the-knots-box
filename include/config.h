@@ -40,12 +40,16 @@
 #ifdef TFT
 #define GNSS_RX 17
 #define GNSS_TX 18
-#define GNSS_PPS 6
-#define GNSS_EN 7
-#define GNSS_EN_GPIO GPIO_NUM_7
+#define GNSS_PPS 16
+#define GNSS_EN 15
+#define GNSS_EN_GPIO GPIO_NUM_15
 
-#define POWER_BTN 15
-#define POWER_BTN_GPIO GPIO_NUM_15
+#define MAIN_BTN 6
+#define MAIN_BTN_GPIO GPIO_NUM_6
+
+#define MODE_BTN 7
+#define NODE_BTN_GPIO GPIO_NUM_7
+
 #define BATTERY_STATUS 5
 #define BATTERY_STATUS_ADC_CHANNEL ADC1_CHANNEL_4
 
