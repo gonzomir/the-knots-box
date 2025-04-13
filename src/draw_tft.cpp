@@ -156,7 +156,7 @@ void setup_display_tft() {
 	lv_style_set_text_line_space(&style_big_label, 0);
 	lv_style_set_pad_left(&style_big_label, 0);
 	lv_style_set_pad_right(&style_big_label, 0);
-	lv_style_set_pad_top(&style_big_label, 0);
+	lv_style_set_pad_top(&style_big_label, 25);
 	lv_style_set_pad_bottom(&style_big_label, 0);
 
 	speed_screen = lv_obj_create(NULL);
