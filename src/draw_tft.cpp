@@ -5,8 +5,6 @@
 #include <Ticker.h>
 
 #include "lvgl.h"
-
-//#include "lv_port.h"
 #include "lv_conf.h"
 
 #include "draw_tft.h"
@@ -57,7 +55,7 @@ void flush_display(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color
 }
 
 /**
- * Call LVGL timr handler and flush display.
+ * Call LVGL timer handler and flush display.
  */
 void timer_handler_tft() {
 	lv_timer_handler();

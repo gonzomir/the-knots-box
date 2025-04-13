@@ -320,6 +320,7 @@ void loop() {
 			draw_battery_status(battery_percents);
 			last_battery_percents = battery_percents;
 		}
+	}
 
 	if (millis() % 5 == 0) {
 		timer_handler();

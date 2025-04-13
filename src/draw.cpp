@@ -166,6 +166,9 @@ void draw_units(String text) {
 	#endif
 }
 
+/**
+ * Timer handler needed by LVGL.
+ */
 void timer_handler() {
 	#ifdef TFT
 	timer_handler_tft();

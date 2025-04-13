@@ -7,8 +7,6 @@
 #include "config.h"
 
 #include "lvgl.h"
-
-#include "lv_port.h"
 #include "lv_conf.h"
 
 #define CANVAS
@@ -98,7 +96,11 @@ void draw_box_tft(uint16_t x, uint16_t y, uint16_t w, uint16_t h, bool partial);
  */
 void draw_start_timer_tft(int seconds);
 
+/**
+ * Call LVGL timer handler and flush display.
+ */
 void timer_handler_tft();
+
 /**
  * Guesture event handler.
  *
