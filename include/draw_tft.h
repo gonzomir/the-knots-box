@@ -102,8 +102,6 @@ void draw_start_timer_tft(int seconds);
 void timer_handler_tft();
 
 /**
- * Guesture event handler.
- *
- * @param lv_event_t e Event object.
+ * Change LVGL screen.
  */
-void screen_event_cb(lv_event_t * e);
+void change_screen_tft();

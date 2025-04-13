@@ -174,3 +174,12 @@ void timer_handler() {
 	timer_handler_tft();
 	#endif
 }
+
+/**
+ * Change LVGL screen.
+ */
+void change_screen() {
+	#ifdef TFT
+	change_screen_tft();
+	#endif
+}

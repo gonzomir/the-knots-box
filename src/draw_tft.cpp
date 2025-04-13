@@ -187,9 +187,6 @@ void setup_display_tft() {
 
 	draw_start_timer_tft(300);
 
-//	lv_obj_add_event_cb(speed_screen, screen_event_cb, LV_EVENT_ALL, NULL);
-//	lv_obj_add_event_cb(timer_screen, screen_event_cb, LV_EVENT_ALL, NULL);
-
 	lv_obj_t * top_bar = lv_obj_create(lv_layer_top());
 	lv_obj_set_size(top_bar, screenWidth - 1, 40);
 	lv_obj_align(top_bar, LV_ALIGN_TOP_MID, 0, 5);
@@ -329,56 +326,21 @@ void draw_start_timer_tft(int seconds) {
 }
 
 /**
- * Guesture event handler.
- *
- * @param lv_event_t e Event object.
+ * Change LVGL screen.
  */
-void screen_event_cb(lv_event_t * e) {
-	if (lv_event_get_code(e) == LV_EVENT_SHORT_CLICKED) {
-		LV_LOG_USER("GOT CLICK EVENT");
-		lv_obj_t * target = lv_event_get_target(e);
-		if (target == timer_label) {
-			LV_LOG_USER("GOT CLICK ON TIMER LABEL");
-			do_start_timer = true;
-			return;
-		}
+void change_screen_tft() {
+	if (display_mode == tkb_mode::speed) {
+		ets_printf("Change screen to start timer.\n");
+		lv_scr_load_anim(timer_screen, LV_SCR_LOAD_ANIM_MOVE_LEFT, 200, 0, false);
+		display_mode = tkb_mode::start;
+		draw_units_tft("Time to start");
+		draw_start_timer_tft(300);
+	} else {
+		ets_printf("Change screen to speed.\n");
+		lv_scr_load_anim(speed_screen, LV_SCR_LOAD_ANIM_MOVE_LEFT, 200, 0, false);
+		display_mode = tkb_mode::speed;
+		draw_units_tft("SOG, Kn");
 	}
-
-	if (lv_event_get_code(e) != LV_EVENT_GESTURE) {
-		return;
-	}
-
-	lv_dir_t direction = lv_indev_get_gesture_dir(lv_indev_get_act());
-
-	switch (direction) {
-		case LV_DIR_LEFT:
-			if (lv_scr_act() == speed_screen) {
-				lv_scr_load_anim(timer_screen, LV_SCR_LOAD_ANIM_MOVE_LEFT, 200, 0, false);
-				display_mode = tkb_mode::start;
-				draw_units_tft("Time to start");
-				draw_start_timer_tft(300);
-			} else {
-				lv_scr_load_anim(speed_screen, LV_SCR_LOAD_ANIM_MOVE_LEFT, 200, 0, false);
-				display_mode = tkb_mode::speed;
-				draw_units_tft("SOG, Kn");
-			}
-			do_start_timer = false;
-			start_timer_started = false;
-			break;
-
-		case LV_DIR_RIGHT:
-			if (lv_scr_act() == speed_screen) {
-				lv_scr_load_anim(timer_screen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, false);
-				display_mode = tkb_mode::start;
-				draw_units_tft("Time to start");
-				draw_start_timer_tft(300);
-			} else {
-				lv_scr_load_anim(speed_screen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, false);
-				display_mode = tkb_mode::speed;
-				draw_units_tft("SOG, Kn");
-			}
-			do_start_timer = false;
-			start_timer_started = false;
-			break;
-	}
+	do_start_timer = false;
+	start_timer_started = false;
 }

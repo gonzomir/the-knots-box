@@ -108,3 +108,8 @@ void draw_box(uint16_t x, uint16_t y, uint16_t w, uint16_t h, bool partial);
  * Timer handler needed by LVGL.
  */
 void timer_handler();
+
+/**
+ * Change LVGL screen.
+ */
+void change_screen();
