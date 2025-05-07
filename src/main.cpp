@@ -32,6 +32,9 @@ int start_timer_time = 300;
 int start_timer_start = 0;
 bool start_timer_started = false;
 
+bool main_button = false;
+bool mode_button = false;
+
 hw_timer_t *battery_timer = NULL;
 
 Ticker battery_ticker;
@@ -44,11 +47,20 @@ void IRAM_ATTR button_pressed() {
 	should_sleep = true;
 }
 
+void IRAM_ATTR button_main_pressed() {
+	main_button = true;
+}
+
+void IRAM_ATTR button_mode_pressed() {
+	mode_button = true;
+}
+
 /**
  * Put the chip in deep sleep and power off the display.
  */
 void go_to_sleep() {
-	detachInterrupt(digitalPinToInterrupt(POWER_BTN));
+	detachInterrupt(digitalPinToInterrupt(MAIN_BTN));
+	detachInterrupt(digitalPinToInterrupt(MODE_BTN));
 	detachInterrupt(digitalPinToInterrupt(GNSS_PPS));
 
 	power_off_display();
@@ -61,7 +73,7 @@ void go_to_sleep() {
 	gpio_deep_sleep_hold_en();
 
 	ets_printf("Going to sleep.\n");
-	esp_sleep_enable_ext0_wakeup(POWER_BTN_GPIO, 1);
+	esp_sleep_enable_ext0_wakeup(MAIN_BTN_GPIO, 0);
 	esp_deep_sleep_start();
 }
 
@@ -228,8 +240,9 @@ void setup() {
 	gpio_deep_sleep_hold_dis();
 	gpio_hold_dis(GNSS_EN_GPIO);
 
-	// On/off button.
-	pinMode(POWER_BTN, INPUT_PULLDOWN);
+	// Buttons.
+	pinMode(MAIN_BTN, INPUT_PULLUP);
+	pinMode(MODE_BTN, INPUT_PULLUP);
 
 	// Battery voltage.
 	pinMode(BATTERY_STATUS, INPUT);
@@ -256,7 +269,9 @@ void setup() {
 
 	Serial2.begin(38400, SERIAL_8N1, GNSS_RX, GNSS_TX);
 
-	attachInterrupt(digitalPinToInterrupt(POWER_BTN), button_pressed, FALLING);
+	attachInterrupt(digitalPinToInterrupt(MAIN_BTN), button_main_pressed, RISING);
+	attachInterrupt(digitalPinToInterrupt(MODE_BTN), button_mode_pressed, RISING);
+
 	attachInterrupt(digitalPinToInterrupt(GNSS_PPS), read_gnss, RISING);
 
 	#ifdef EINK
@@ -290,6 +305,23 @@ void loop() {
 		return;
 	}
 
+	if (mode_button) {
+		ets_printf("Mode button pressed.\n");
+		mode_button = false;
+		change_screen();
+	}
+
+	if (main_button) {
+		ets_printf("Main button pressed.\n");
+		main_button = false;
+		if (display_mode == tkb_mode::start && !do_start_timer) {
+			ets_printf("Start start timer.\n");
+			start_timer_time = 300;
+			start_timer_start = millis() / 1000;
+			do_start_timer = true;
+		}
+	}
+
 	switch (display_mode) {
 		case tkb_mode::speed:
 			do_speed();
@@ -320,5 +352,9 @@ void loop() {
 			draw_battery_status(battery_percents);
 			last_battery_percents = battery_percents;
 		}
+	}
+
+	if (millis() % 5 == 0) {
+		timer_handler();
 	}
 }

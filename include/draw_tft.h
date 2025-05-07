@@ -1,14 +1,15 @@
 #include <cmath>
 #include <Arduino.h>
+#include <Arduino_GFX_Library.h>
+
+#include <Ticker.h>
 
 #include "config.h"
 
 #include "lvgl.h"
-
-#include "display.h"
-#include "esp_bsp.h"
-#include "lv_port.h"
 #include "lv_conf.h"
+
+#define CANVAS
 
 /**
  * Setup the display.
@@ -96,8 +97,11 @@ void draw_box_tft(uint16_t x, uint16_t y, uint16_t w, uint16_t h, bool partial);
 void draw_start_timer_tft(int seconds);
 
 /**
- * Guesture event handler.
- *
- * @param lv_event_t e Event object.
+ * Call LVGL timer handler and flush display.
  */
-void screen_event_cb(lv_event_t * e);
+void timer_handler_tft();
+
+/**
+ * Change LVGL screen.
+ */
+void change_screen_tft();

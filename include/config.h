@@ -40,12 +40,16 @@
 #ifdef TFT
 #define GNSS_RX 17
 #define GNSS_TX 18
-#define GNSS_PPS 6
-#define GNSS_EN 7
-#define GNSS_EN_GPIO GPIO_NUM_7
+#define GNSS_PPS 16
+#define GNSS_EN 15
+#define GNSS_EN_GPIO GPIO_NUM_15
 
-#define POWER_BTN 15
-#define POWER_BTN_GPIO GPIO_NUM_15
+#define MAIN_BTN 6
+#define MAIN_BTN_GPIO GPIO_NUM_6
+
+#define MODE_BTN 7
+#define NODE_BTN_GPIO GPIO_NUM_7
+
 #define BATTERY_STATUS 5
 #define BATTERY_STATUS_ADC_CHANNEL ADC1_CHANNEL_4
 
@@ -56,13 +60,15 @@
 #define DISPLAY_RST -1
 #define DISPLAY_BUSY -1
 
+#define GFX_BL 1
+
 #define LCD_QSPI_HOST           (SPI2_HOST)
-#define PIN_NUM_QSPI_CS         (GPIO_NUM_45)
-#define PIN_NUM_QSPI_PCLK       (GPIO_NUM_47)
-#define PIN_NUM_QSPI_DATA0      (GPIO_NUM_21)
-#define PIN_NUM_QSPI_DATA1      (GPIO_NUM_48)
-#define PIN_NUM_QSPI_DATA2      (GPIO_NUM_40)
-#define PIN_NUM_QSPI_DATA3      (GPIO_NUM_39)
+#define PIN_NUM_QSPI_CS 45
+#define PIN_NUM_QSPI_PCLK 47
+#define PIN_NUM_QSPI_DATA0 21
+#define PIN_NUM_QSPI_DATA1 48
+#define PIN_NUM_QSPI_DATA2 40
+#define PIN_NUM_QSPI_DATA3 39
 #define PIN_NUM_QSPI_RST        (GPIO_NUM_NC)
 #define PIN_NUM_QSPI_DC         (GPIO_NUM_8)
 #define PIN_NUM_QSPI_TE         (GPIO_NUM_38)

@@ -1,14 +1,24 @@
 #include <cmath>
 #include <Arduino.h>
+#include <Arduino_GFX_Library.h>
+
+#include <Ticker.h>
 
 #include "lvgl.h"
-
-#include "display.h"
-#include "esp_bsp.h"
-#include "lv_port.h"
 #include "lv_conf.h"
 
 #include "draw_tft.h"
+
+static uint32_t screenWidth;
+static uint32_t screenHeight;
+static uint32_t bufSize;
+static lv_disp_draw_buf_t draw_buf;
+static lv_color_t *disp_draw_buf;
+static lv_disp_drv_t disp_drv;
+
+Arduino_DataBus *bus = NULL;
+Arduino_GFX *g = NULL;
+Arduino_GFX *gfx = NULL;
 
 lv_obj_t *speed_screen = NULL;
 lv_obj_t *timer_screen = NULL;
@@ -21,21 +31,109 @@ lv_obj_t *time_label = NULL;
 lv_obj_t *battery_label = NULL;
 lv_obj_t *units_label = NULL;
 
+// Declare Ticker objects as global variables.
+Ticker lvgl_tick;
+
+/**
+ * Flush display.
+ *
+ * @param disp
+ * @param area
+ * @param color_p
+ */
+void flush_display(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p) {
+	uint32_t w = (area->x2 - area->x1 + 1);
+	uint32_t h = (area->y2 - area->y1 + 1);
+
+#if (LV_COLOR_16_SWAP != 0)
+	gfx->draw16bitBeRGBBitmap(area->x1, area->y1, (uint16_t *)&color_p->full, w, h);
+#else
+	gfx->draw16bitRGBBitmap(area->x1, area->y1, (uint16_t *)&color_p->full, w, h);
+#endif
+
+	lv_disp_flush_ready(disp);
+}
+
+/**
+ * Call LVGL timer handler and flush display.
+ */
+void timer_handler_tft() {
+	lv_timer_handler();
+	gfx->flush();
+}
+
+/**
+ * Increment LVGL tick.
+ */
+void IRAM_ATTR tick_handler() {
+	lv_tick_inc(5);
+}
+
+/**
+ * Turn display backlight on.
+ */
+void display_backlight_on() {
+	digitalWrite(GFX_BL, HIGH);
+}
+
+/**
+ * Turn display backlight off.
+ */
+void display_backlight_off() {
+	digitalWrite(GFX_BL, LOW);
+}
+
 /**
  * Setup the display.
  */
 void setup_display_tft() {
-	bsp_display_cfg_t cfg = {
-			.lvgl_port_cfg = ESP_LVGL_PORT_INIT_CONFIG(),
-			.buffer_size = LCD_QSPI_H_RES * LCD_QSPI_V_RES,
-			.rotate = LV_DISP_ROT_90,
-	};
+	bus = new Arduino_ESP32QSPI(PIN_NUM_QSPI_CS, PIN_NUM_QSPI_PCLK, PIN_NUM_QSPI_DATA0, PIN_NUM_QSPI_DATA1, PIN_NUM_QSPI_DATA2, PIN_NUM_QSPI_DATA3);
+	g = new Arduino_NV3041A(bus, GFX_NOT_DEFINED /* RST */, 0 /* rotation */, true /* IPS */);
+	gfx = new Arduino_Canvas(480 /* width */, 272 /* height */, g);
 
-	bsp_display_start_with_config(&cfg);
-	bsp_display_backlight_on();
+	// Init Display.
+	if (!gfx->begin()) {
+		ets_printf("gfx->begin() failed!\n");
+		return;
+	}
+	gfx->fillScreen(RED);
 
-	bsp_display_lock(0);
+	pinMode(GFX_BL, OUTPUT);
+	display_backlight_on();
 
+	lv_init();
+
+	screenWidth = gfx->width();
+	screenHeight = gfx->height();
+
+	bufSize = screenWidth * 40;
+
+	disp_draw_buf = (lv_color_t *) heap_caps_malloc(sizeof(lv_color_t) * bufSize, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
+	if (!disp_draw_buf) {
+		// Remove MALLOC_CAP_INTERNAL flag and try again.
+		disp_draw_buf = (lv_color_t *) heap_caps_malloc(sizeof(lv_color_t) * bufSize, MALLOC_CAP_8BIT);
+		if (!disp_draw_buf) {
+			while (1) {
+				ets_printf("Error: Failed to allocate memory for display buffer.\n");
+				delay(1000);
+			}
+		}
+	}
+
+	lv_disp_draw_buf_init(&draw_buf, disp_draw_buf, NULL, bufSize);
+
+	// Initialize the display.
+	lv_disp_drv_init(&disp_drv);
+	disp_drv.hor_res = screenWidth;
+	disp_drv.ver_res = screenHeight;
+	disp_drv.flush_cb = flush_display;
+	disp_drv.draw_buf = &draw_buf;
+
+	lv_disp_drv_register(&disp_drv);
+
+	lvgl_tick.attach_ms(5, tick_handler);
+
+	// Start drawing.
 	lv_color_t background_color = lv_color_hex(0x000000);
 	lv_color_t text_color = lv_color_hex(0xFFFFFF);
 
@@ -58,7 +156,7 @@ void setup_display_tft() {
 	lv_style_set_text_line_space(&style_big_label, 0);
 	lv_style_set_pad_left(&style_big_label, 0);
 	lv_style_set_pad_right(&style_big_label, 0);
-	lv_style_set_pad_top(&style_big_label, 0);
+	lv_style_set_pad_top(&style_big_label, 25);
 	lv_style_set_pad_bottom(&style_big_label, 0);
 
 	speed_screen = lv_obj_create(NULL);
@@ -89,11 +187,8 @@ void setup_display_tft() {
 
 	draw_start_timer_tft(300);
 
-	lv_obj_add_event_cb(speed_screen, screen_event_cb, LV_EVENT_ALL, NULL);
-	lv_obj_add_event_cb(timer_screen, screen_event_cb, LV_EVENT_ALL, NULL);
-
 	lv_obj_t * top_bar = lv_obj_create(lv_layer_top());
-	lv_obj_set_size(top_bar, LCD_QSPI_V_RES, 40);
+	lv_obj_set_size(top_bar, screenWidth - 1, 40);
 	lv_obj_align(top_bar, LV_ALIGN_TOP_MID, 0, 5);
 	lv_obj_set_flex_flow(top_bar, LV_FLEX_FLOW_ROW);
 	lv_obj_set_flex_align(top_bar, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
@@ -112,7 +207,7 @@ void setup_display_tft() {
 	lv_obj_align(battery_label, LV_ALIGN_OUT_RIGHT_MID, 0, 0);
 
 	lv_obj_t * bottom_bar = lv_obj_create(lv_layer_top());
-	lv_obj_set_size(bottom_bar, LCD_QSPI_V_RES, 40);
+	lv_obj_set_size(bottom_bar, screenWidth - 1, 40);
 	lv_obj_align(bottom_bar, LV_ALIGN_BOTTOM_MID, 0, 5);
 	lv_obj_set_flex_flow(bottom_bar, LV_FLEX_FLOW_ROW);
 	lv_obj_set_flex_align(bottom_bar, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
@@ -129,17 +224,13 @@ void setup_display_tft() {
 	lv_obj_align(status_label, LV_ALIGN_OUT_LEFT_MID, 0, 0);
 	units_label = lv_label_create(bottom_bar);
 	lv_obj_align(units_label, LV_ALIGN_OUT_RIGHT_MID, 0, 0);
-
-	bsp_display_unlock();
 }
 
 /**
  * Power off the display.
  */
 void power_off_display_tft() {
-	bsp_display_backlight_off();
-	lvgl_port_deinit();
-	bsp_display_off();
+	display_backlight_off();
 }
 
 /**
@@ -155,9 +246,7 @@ void clear_display_tft() {
  * @param speed
  */
 void draw_speed_tft(float speed) {
-	bsp_display_lock(0);
 	lv_label_set_text_fmt(speed_label, "%0.1f", speed);
-	bsp_display_unlock();
 }
 
 /**
@@ -184,18 +273,14 @@ void draw_bottom_bar_tft() {
  * @param text
  */
 void draw_status_tft(String text) {
-	bsp_display_lock(0);
 	lv_label_set_text(status_label, text.c_str());
-	bsp_display_unlock();
 }
 
 /**
  * Clear status text area.
  */
 void clear_status_tft() {
-	bsp_display_lock(0);
 	lv_label_set_text(status_label, "");
-	bsp_display_unlock();
 }
 
 /**
@@ -204,9 +289,7 @@ void clear_status_tft() {
  * @param percentage Battery capacity.
  */
 void draw_battery_status_tft(int percentage) {
-	bsp_display_lock(0);
 	lv_label_set_text_fmt(battery_label, "%d%%", percentage);
-	bsp_display_unlock();
 }
 
 /**
@@ -217,9 +300,7 @@ void draw_battery_status_tft(int percentage) {
  * @param seconds
  */
 void draw_time_tft(int hours, int minutes, int seconds) {
-	bsp_display_lock(0);
 	lv_label_set_text_fmt(time_label, "%02d:%02d", hours, minutes);
-	bsp_display_unlock();
 }
 
 /**
@@ -228,9 +309,7 @@ void draw_time_tft(int hours, int minutes, int seconds) {
  * @param text
  */
 void draw_units_tft(String text) {
-	bsp_display_lock(0);
 	lv_label_set_text(units_label, text.c_str());
-	bsp_display_unlock();
 }
 
 /**
@@ -243,63 +322,25 @@ void draw_start_timer_tft(int seconds) {
 	minutes = seconds / 60;
 	seconds = seconds % 60;
 
-	bsp_display_lock(0);
 	lv_label_set_text_fmt(timer_label, "%d:%02d", minutes, seconds);
-	bsp_display_unlock();
 }
 
 /**
- * Guesture event handler.
- *
- * @param lv_event_t e Event object.
+ * Change LVGL screen.
  */
-void screen_event_cb(lv_event_t * e) {
-	if (lv_event_get_code(e) == LV_EVENT_SHORT_CLICKED) {
-		LV_LOG_USER("GOT CLICK EVENT");
-		lv_obj_t * target = lv_event_get_target(e);
-		if (target == timer_label) {
-			LV_LOG_USER("GOT CLICK ON TIMER LABEL");
-			do_start_timer = true;
-			return;
-		}
+void change_screen_tft() {
+	if (display_mode == tkb_mode::speed) {
+		ets_printf("Change screen to start timer.\n");
+		lv_scr_load_anim(timer_screen, LV_SCR_LOAD_ANIM_MOVE_LEFT, 200, 0, false);
+		display_mode = tkb_mode::start;
+		draw_units_tft("Time to start");
+		draw_start_timer_tft(300);
+	} else {
+		ets_printf("Change screen to speed.\n");
+		lv_scr_load_anim(speed_screen, LV_SCR_LOAD_ANIM_MOVE_LEFT, 200, 0, false);
+		display_mode = tkb_mode::speed;
+		draw_units_tft("SOG, Kn");
 	}
-
-	if (lv_event_get_code(e) != LV_EVENT_GESTURE) {
-		return;
-	}
-
-	lv_dir_t direction = lv_indev_get_gesture_dir(lv_indev_get_act());
-
-	switch (direction) {
-		case LV_DIR_LEFT:
-			if (lv_scr_act() == speed_screen) {
-				lv_scr_load_anim(timer_screen, LV_SCR_LOAD_ANIM_MOVE_LEFT, 200, 0, false);
-				display_mode = tkb_mode::start;
-				draw_units_tft("Time to start");
-				draw_start_timer_tft(300);
-			} else {
-				lv_scr_load_anim(speed_screen, LV_SCR_LOAD_ANIM_MOVE_LEFT, 200, 0, false);
-				display_mode = tkb_mode::speed;
-				draw_units_tft("SOG, Kn");
-			}
-			do_start_timer = false;
-			start_timer_started = false;
-			break;
-
-		case LV_DIR_RIGHT:
-			if (lv_scr_act() == speed_screen) {
-				lv_scr_load_anim(timer_screen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, false);
-				display_mode = tkb_mode::start;
-				draw_units_tft("Time to start");
-				draw_start_timer_tft(300);
-			} else {
-				lv_scr_load_anim(speed_screen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, false);
-				display_mode = tkb_mode::speed;
-				draw_units_tft("SOG, Kn");
-			}
-			do_start_timer = false;
-			start_timer_started = false;
-			break;
-
-	}
+	do_start_timer = false;
+	start_timer_started = false;
 }

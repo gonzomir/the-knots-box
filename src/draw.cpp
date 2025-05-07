@@ -165,3 +165,21 @@ void draw_units(String text) {
 	draw_units_tft(text);
 	#endif
 }
+
+/**
+ * Timer handler needed by LVGL.
+ */
+void timer_handler() {
+	#ifdef TFT
+	timer_handler_tft();
+	#endif
+}
+
+/**
+ * Change LVGL screen.
+ */
+void change_screen() {
+	#ifdef TFT
+	change_screen_tft();
+	#endif
+}
