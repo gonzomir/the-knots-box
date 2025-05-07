@@ -60,6 +60,7 @@ void IRAM_ATTR button_mode_pressed() {
  */
 void go_to_sleep() {
 	detachInterrupt(digitalPinToInterrupt(MAIN_BTN));
+	detachInterrupt(digitalPinToInterrupt(MODE_BTN));
 	detachInterrupt(digitalPinToInterrupt(GNSS_PPS));
 
 	power_off_display();
@@ -72,7 +73,7 @@ void go_to_sleep() {
 	gpio_deep_sleep_hold_en();
 
 	ets_printf("Going to sleep.\n");
-	esp_sleep_enable_ext0_wakeup(MAIN_BTN_GPIO, 1);
+	esp_sleep_enable_ext0_wakeup(MAIN_BTN_GPIO, 0);
 	esp_deep_sleep_start();
 }
 
