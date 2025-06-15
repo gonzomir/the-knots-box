@@ -135,7 +135,7 @@ void setup_display() {
 
 	// Start drawing.
 	lv_color_t background_color = lv_color_hex(0x000000);
-	lv_color_t text_color = lv_color_hex(0xFFFFFF);
+	lv_color_t text_color = lv_color_hex(0xFFFF00);
 
 	static lv_style_t style_screen;
 	lv_style_init(&style_screen);
