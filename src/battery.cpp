@@ -45,24 +45,12 @@ float get_battery_voltage() {
 	}
 
 	/**
-	 * The voltage devider is 100k to 100k, so the multiplier is (100 + 100) / 100 = 2.
-	 * If we take into account ESP32's GPIO impedance (1.3Mohms), the resulting
-	 * multiplier is (93 + 100) / 93 = 2.08, but that gives results higher than the real voltage.
-	 * Empirically 2.04 gives results closer to real life (or maybe the GPIO impedance is not 1.3Mohms).
-	 */
-	#ifdef EINK
-	return voltage * 2.04;
-	#endif
-
-	/**
 	 * The voltage devider is 33k to 100k, so the multiplier is (100 + 33) / 100 = 1.33.
 	 * If we take into account ESP32's GPIO impedance (1.3Mohms), the resulting
 	 * multiplier is (93 + 33) / 93 = 1.36. But comparing ADC reading to measured
 	 * battery voltage gives 1.76 as a multiplier.
 	 */
-	#ifdef TFT
 	return voltage * 1.76;
-	#endif
 }
 
 /**

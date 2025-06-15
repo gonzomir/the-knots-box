@@ -116,19 +116,6 @@ void do_speed() {
 							int hours = atoi(gps_time.substr(0, 2).c_str());
 							int minutes = atoi(gps_time.substr(2, 2).c_str());
 							int seconds = atoi(gps_time.substr(4, 2).c_str());
-
-							// Clear eInk display every 5 minutes.
-							#ifdef EINK
-							if (minutes % 5 == 0 && seconds == 0) {
-								clear_display();
-								draw_top_bar();
-								draw_bottom_bar();
-								draw_units("SOG, Kn");
-								battery_read = true;
-								last_battery_percents = 0;
-							}
-							#endif
-
 							draw_time(hours, minutes, seconds);
 						}
 						break;
@@ -258,7 +245,6 @@ void setup() {
 	Serial.begin(115200);
 
 	setup_display();
-	clear_display();
 	draw_top_bar();
 	draw_bottom_bar();
 	draw_units("SOG, Kn");
@@ -274,15 +260,7 @@ void setup() {
 
 	attachInterrupt(digitalPinToInterrupt(GNSS_PPS), read_gnss, RISING);
 
-	#ifdef EINK
-	battery_timer = timerBegin(1);
-	timerAttachInterrupt(battery_timer, &read_battery);
-	timerAlarm(battery_timer, 1000000 * 60, true, 0);
-	#endif
-
-	#ifdef TFT
 	battery_ticker.attach(60, read_battery);
-	#endif
 
 	// Print the XTAL crystal frequency
 	ets_printf("XTAL Crystal Frequency: %d MHz\n", getXtalFrequencyMhz());
