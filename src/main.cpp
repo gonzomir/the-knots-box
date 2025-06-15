@@ -245,8 +245,6 @@ void setup() {
 	Serial.begin(115200);
 
 	setup_display();
-	draw_top_bar();
-	draw_bottom_bar();
 	draw_units("SOG, Kn");
 	draw_speed(0.0);
 	draw_time(0, 0 ,0);

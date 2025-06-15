@@ -243,24 +243,6 @@ void draw_speed(float speed) {
 }
 
 /**
- * Draw top status bar.
- *
- * @param text
- */
-void draw_top_bar() {
-	return;
-}
-
-/**
- * Draw bottom status bar.
- *
- * @param text
- */
-void draw_bottom_bar() {
-	return;
-}
-
-/**
  * Draw status text.
  *
  * @param text

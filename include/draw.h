@@ -34,16 +34,6 @@ void clear_display();
 void draw_speed(float speed);
 
 /**
- * Draw top status bar.
- */
-void draw_top_bar();
-
-/**
- * Draw bottom status bar.
- */
-void draw_bottom_bar();
-
-/**
  * Draw status text.
  *
  * @param text
