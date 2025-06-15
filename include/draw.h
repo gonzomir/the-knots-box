@@ -1,23 +1,15 @@
 #include <cmath>
+#include <Arduino.h>
+#include <Arduino_GFX_Library.h>
 
-#include <GxEPD2_BW.h>
-#include <GxEPD2_3C.h>
+#include <Ticker.h>
 
-#define USE_HSPI_FOR_EPD
-#define ENABLE_GxEPD2_GFX 0
+#include "config.h"
 
-#define GxEPD2_DISPLAY_CLASS GxEPD2_BW
-#define GxEPD2_DRIVER_CLASS GxEPD2_420_M01
+#include "lvgl.h"
+#include "lv_conf.h"
 
-#define GxEPD2_BW_IS_GxEPD2_BW true
-#define GxEPD2_3C_IS_GxEPD2_3C true
-#define GxEPD2_7C_IS_GxEPD2_7C true
-#define GxEPD2_1248_IS_GxEPD2_1248 true
-#define IS_GxEPD(c, x) (c##x)
-#define IS_GxEPD2_BW(x) IS_GxEPD(GxEPD2_BW_IS_, x)
-#define IS_GxEPD2_3C(x) IS_GxEPD(GxEPD2_3C_IS_, x)
-#define IS_GxEPD2_7C(x) IS_GxEPD(GxEPD2_7C_IS_, x)
-#define IS_GxEPD2_1248(x) IS_GxEPD(GxEPD2_1248_IS_, x)
+#define CANVAS
 
 /**
  * Setup the display.
@@ -40,13 +32,6 @@ void clear_display();
  * @param speed
  */
 void draw_speed(float speed);
-
-/**
- * Draw start timer.
- *
- * @param start_time
- */
-void draw_start_timer(int start_time);
 
 /**
  * Draw top status bar.
@@ -105,7 +90,14 @@ void draw_units(String text);
 void draw_box(uint16_t x, uint16_t y, uint16_t w, uint16_t h, bool partial);
 
 /**
- * Timer handler needed by LVGL.
+ * Draw start timer.
+ *
+ * @param seconds
+ */
+void draw_start_timer(int seconds);
+
+/**
+ * Call LVGL timer handler and flush display.
  */
 void timer_handler();
 
