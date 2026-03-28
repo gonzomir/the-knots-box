@@ -96,6 +96,9 @@ void setup_display() {
 		ets_printf("gfx->begin() failed!\n");
 		return;
 	}
+
+	gfx->invertDisplay(true);
+
 	gfx->fillScreen(RED);
 
 	pinMode(GFX_BL, OUTPUT);
