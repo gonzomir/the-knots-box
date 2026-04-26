@@ -1,28 +1,19 @@
 #include <Arduino.h>
 
-#define GNSS_RX 17
-#define GNSS_TX 18
-#define GNSS_PPS 16
-#define GNSS_EN 15
-#define GNSS_EN_GPIO GPIO_NUM_15
+#define GNSS_RX 1
+#define GNSS_TX 2
+#define GNSS_PPS 3
+#define GNSS_EN 17
+#define GNSS_EN_GPIO GPIO_NUM_17
 
-#define MAIN_BTN 6
-#define MAIN_BTN_GPIO GPIO_NUM_6
+#define MAIN_BTN 0
+#define MAIN_BTN_GPIO GPIO_NUM_0
 
-#define MODE_BTN 7
-#define NODE_BTN_GPIO GPIO_NUM_7
+#define MODE_BTN 18
+#define NODE_BTN_GPIO GPIO_NUM_18
 
-#define BATTERY_STATUS 5
-#define BATTERY_STATUS_ADC_CHANNEL ADC1_CHANNEL_4
-
-#define DISPLAY_DIN -1
-#define DISPLAY_CLK -1
-#define DISPLAY_CS -1
-#define DISPLAY_DC -1
-#define DISPLAY_RST -1
-#define DISPLAY_BUSY -1
-
-#define GFX_BL 1
+#define BATTERY_STATUS 4
+#define BATTERY_STATUS_ADC_CHANNEL ADC1_CHANNEL_3
 
 #define LCD_QSPI_HOST           (SPI2_HOST)
 #define PIN_NUM_QSPI_CS 45
@@ -35,11 +26,6 @@
 #define PIN_NUM_QSPI_DC         (GPIO_NUM_8)
 #define PIN_NUM_QSPI_TE         (GPIO_NUM_38)
 #define PIN_NUM_QSPI_BL         (GPIO_NUM_1)
-
-#define PIN_NUM_QSPI_TOUCH_SCL  (GPIO_NUM_8)
-#define PIN_NUM_QSPI_TOUCH_SDA  (GPIO_NUM_4)
-#define PIN_NUM_QSPI_TOUCH_RST  (-1)
-#define PIN_NUM_QSPI_TOUCH_INT  (-1)
 
 #ifndef CONFIG_H
 #define CONFIG_H
