@@ -2,8 +2,6 @@
 #include <Arduino.h>
 #include <Arduino_GFX_Library.h>
 
-#include <Ticker.h>
-
 #include "config.h"
 
 #include "lvgl.h"

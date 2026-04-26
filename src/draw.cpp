@@ -2,8 +2,8 @@
 #include <Arduino.h>
 #include <Arduino_GFX_Library.h>
 
-#include <Ticker.h>
-
+#include "display_bsp.h"
+#include "lv_port.h"
 #include "lvgl.h"
 #include "lv_conf.h"
 
@@ -16,9 +16,7 @@ static lv_disp_draw_buf_t draw_buf;
 static lv_color_t *disp_draw_buf;
 static lv_disp_drv_t disp_drv;
 
-Arduino_DataBus *bus = NULL;
-Arduino_GFX *g = NULL;
-Arduino_GFX *gfx = NULL;
+DisplayPort RlcdPort(12, 11, 5, 40, 41, 400, 300);
 
 lv_obj_t *speed_screen = NULL;
 lv_obj_t *timer_screen = NULL;
@@ -31,9 +29,6 @@ lv_obj_t *time_label = NULL;
 lv_obj_t *battery_label = NULL;
 lv_obj_t *units_label = NULL;
 
-// Declare Ticker objects as global variables.
-Ticker lvgl_tick;
-
 /**
  * Flush display.
  *
@@ -41,104 +36,32 @@ Ticker lvgl_tick;
  * @param area
  * @param color_p
  */
-void flush_display(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p) {
-	uint32_t w = (area->x2 - area->x1 + 1);
-	uint32_t h = (area->y2 - area->y1 + 1);
-
-#if (LV_COLOR_16_SWAP != 0)
-	gfx->draw16bitBeRGBBitmap(area->x1, area->y1, (uint16_t *)&color_p->full, w, h);
-#else
-	gfx->draw16bitRGBBitmap(area->x1, area->y1, (uint16_t *)&color_p->full, w, h);
-#endif
-
-	lv_disp_flush_ready(disp);
-}
-
-/**
- * Call LVGL timer handler and flush display.
- */
-void timer_handler() {
-	lv_timer_handler();
-	gfx->flush();
-}
-
-/**
- * Increment LVGL tick.
- */
-void IRAM_ATTR tick_handler() {
-	lv_tick_inc(5);
-}
-
-/**
- * Turn display backlight on.
- */
-void display_backlight_on() {
-	digitalWrite(GFX_BL, HIGH);
-}
-
-/**
- * Turn display backlight off.
- */
-void display_backlight_off() {
-	digitalWrite(GFX_BL, LOW);
+static void lvgl_flushcallback(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_map) {
+  uint16_t *buffer = (uint16_t *)color_map;
+  for (int y = area->y1; y <= area->y2; y++) {
+    for (int x = area->x1; x <= area->x2; x++) {
+      uint8_t color = (*buffer < 0x7fff) ? ColorBlack : ColorWhite;
+      RlcdPort.RLCD_SetPixel(x, y, color);
+      buffer++;
+    }
+  }
+  RlcdPort.RLCD_Display();
+  lv_disp_flush_ready(drv);
 }
 
 /**
  * Setup the display.
  */
 void setup_display() {
-	bus = new Arduino_ESP32QSPI(PIN_NUM_QSPI_CS, PIN_NUM_QSPI_PCLK, PIN_NUM_QSPI_DATA0, PIN_NUM_QSPI_DATA1, PIN_NUM_QSPI_DATA2, PIN_NUM_QSPI_DATA3);
-	g = new Arduino_NV3041A(bus, GFX_NOT_DEFINED /* RST */, 0 /* rotation */, true /* IPS */);
-	gfx = new Arduino_Canvas(480 /* width */, 272 /* height */, g);
+	screenWidth = 400;
+	screenHeight = 300;
 
-	// Init Display.
-	if (!gfx->begin()) {
-		ets_printf("gfx->begin() failed!\n");
-		return;
-	}
-
-	gfx->invertDisplay(true);
-
-	gfx->fillScreen(RED);
-
-	pinMode(GFX_BL, OUTPUT);
-	display_backlight_on();
-
-	lv_init();
-
-	screenWidth = gfx->width();
-	screenHeight = gfx->height();
-
-	bufSize = screenWidth * 40;
-
-	disp_draw_buf = (lv_color_t *) heap_caps_malloc(sizeof(lv_color_t) * bufSize, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
-	if (!disp_draw_buf) {
-		// Remove MALLOC_CAP_INTERNAL flag and try again.
-		disp_draw_buf = (lv_color_t *) heap_caps_malloc(sizeof(lv_color_t) * bufSize, MALLOC_CAP_8BIT);
-		if (!disp_draw_buf) {
-			while (1) {
-				ets_printf("Error: Failed to allocate memory for display buffer.\n");
-				delay(1000);
-			}
-		}
-	}
-
-	lv_disp_draw_buf_init(&draw_buf, disp_draw_buf, NULL, bufSize);
-
-	// Initialize the display.
-	lv_disp_drv_init(&disp_drv);
-	disp_drv.hor_res = screenWidth;
-	disp_drv.ver_res = screenHeight;
-	disp_drv.flush_cb = flush_display;
-	disp_drv.draw_buf = &draw_buf;
-
-	lv_disp_drv_register(&disp_drv);
-
-	lvgl_tick.attach_ms(5, tick_handler);
+  RlcdPort.RLCD_Init();
+  lvgl_portinit(screenWidth, screenHeight, lvgl_flushcallback);
 
 	// Start drawing.
-	lv_color_t background_color = lv_color_hex(0x000000);
-	lv_color_t text_color = lv_color_hex(0xFFFF00);
+	lv_color_t background_color = lv_color_hex(0xFFFFFF);
+	lv_color_t text_color = lv_color_hex(0x000000);
 
 	static lv_style_t style_screen;
 	lv_style_init(&style_screen);
@@ -233,7 +156,6 @@ void setup_display() {
  * Power off the display.
  */
 void power_off_display() {
-	display_backlight_off();
 }
 
 /**
