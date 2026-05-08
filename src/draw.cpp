@@ -16,7 +16,7 @@ static lv_disp_draw_buf_t draw_buf;
 static lv_color_t *disp_draw_buf;
 static lv_disp_drv_t disp_drv;
 
-DisplayPort RlcdPort(12, 11, 5, 40, 41, 400, 300);
+DisplayPort RlcdPort(DISPLAY_MOSI, DISPLAY_SCL, DISPLAY_DC, DISPLAY_CS, DISPLAY_RST, DISPLAY_W, DISPLAY_H);
 
 lv_obj_t *speed_screen = NULL;
 lv_obj_t *timer_screen = NULL;
@@ -53,8 +53,8 @@ static void lvgl_flushcallback(lv_disp_drv_t *drv, const lv_area_t *area, lv_col
  * Setup the display.
  */
 void setup_display() {
-	screenWidth = 400;
-	screenHeight = 300;
+	screenWidth = DISPLAY_W;
+	screenHeight = DISPLAY_H;
 
   RlcdPort.RLCD_Init();
   lvgl_portinit(screenWidth, screenHeight, lvgl_flushcallback);
