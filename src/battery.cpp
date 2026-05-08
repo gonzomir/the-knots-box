@@ -21,7 +21,7 @@ void calibrate_adc() {
 	ret = esp_adc_cal_check_efuse(ESP_ADC_CAL_VAL_EFUSE_VREF);
 	if (ret == ESP_OK) {
 		has_calibration = true;
-		esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_12, ADC_WIDTH_BIT_DEFAULT, 0, &adc_chars);
+		esp_adc_cal_characterize(ADC_UNIT_1, BATTERY_STATUS_ATTENUATION, ADC_WIDTH_BIT_DEFAULT, 0, &adc_chars);
 	}
 }
 
@@ -31,10 +31,11 @@ void calibrate_adc() {
  * @return float Battery voltage.
  */
 float get_battery_voltage() {
-	adc1_config_channel_atten(BATTERY_STATUS_ADC_CHANNEL, ADC_ATTEN_DB_12);
+	adc1_config_channel_atten(BATTERY_STATUS_ADC_CHANNEL, BATTERY_STATUS_ATTENUATION);
 
 	uint32_t raw = adc1_get_raw(BATTERY_STATUS_ADC_CHANNEL);
 	ets_printf("Battery raw reading: %d\n", raw);
+	ets_printf("Battery has calibrateion: %s\n", has_calibration ? "true" : "false");
 
 	float voltage;
 	if (has_calibration) {
@@ -44,13 +45,17 @@ float get_battery_voltage() {
 		voltage = raw * 3.3/4096.0;
 	}
 
+	char buffer[10];
+	dtostrf(voltage, 6, 2, buffer);
+	ets_printf("Battery raw volage: %s\n", buffer);
+
 	/**
-	 * The voltage devider is 33k to 100k, so the multiplier is (100 + 33) / 100 = 1.33.
+	 * The voltage devider is 200k to 100k, so the multiplier is (100 + 200) / 200 = 3.
 	 * If we take into account ESP32's GPIO impedance (1.3Mohms), the resulting
-	 * multiplier is (93 + 33) / 93 = 1.36. But comparing ADC reading to measured
+	 * multiplier is (93 + 200) / 93 = 3.15. But comparing ADC reading to measured
 	 * battery voltage gives 1.76 as a multiplier.
 	 */
-	return voltage * 1.76;
+	return voltage * 3.15;
 }
 
 /**
