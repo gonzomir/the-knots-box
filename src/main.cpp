@@ -331,8 +331,7 @@ void loop() {
 		}
 	}
 
-	// usb_storage_init() sets this from a different task; only touch LVGL
-	// (draw_usb_status) here, from loop()'s task.
+	// Only touch LVGL (draw_usb_status) here, from loop()'s task.
 	bool usb_connected = usb_storage_is_connected();
 	if (usb_connected != usb_connected_displayed) {
 		draw_usb_status(usb_connected);

@@ -8,8 +8,7 @@
 void usb_storage_init();
 
 /**
- * Whether a USB host is currently connected. Set from the USB event task,
- * so poll it from loop() rather than reacting to it from another task
- * directly - in particular, never touch LVGL from that task.
+ * Whether a USB host is currently connected. Safe to call from any task,
+ * but only touch LVGL from loop()'s task when reacting to a change.
  */
 bool usb_storage_is_connected();
