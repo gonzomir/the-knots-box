@@ -1,11 +1,38 @@
 #include <Arduino.h>
+#include <cmath>
 #include <cstdio>
 #include <cstdlib>
 
 #include "sdcard.h"
 #include "track.h"
 
+// Skip logging a fix this close to the last logged one - twice the GNSS
+// module's rated accuracy, so we don't fill the log with position noise
+// while stationary or moving very slowly. Still log at least this often
+// regardless, so a long stop doesn't leave a gap in the track.
+static const double MIN_LOG_DISTANCE_M = 3.0;
+static const unsigned long MAX_LOG_INTERVAL_MS = 30UL * 60 * 1000;
+
 static bool active = false;
+static bool has_last_logged_position = false;
+static double last_logged_lat = 0.0;
+static double last_logged_lon = 0.0;
+static unsigned long last_logged_millis = 0;
+
+/**
+ * Approximate distance between two coordinates, in meters. Equirectangular
+ * approximation - accurate enough at the short distances between fixes,
+ * much cheaper than a full great-circle formula.
+ */
+static double distance_meters(double lat1, double lon1, double lat2, double lon2) {
+	const double deg_to_rad = PI / 180.0;
+	const double earth_radius_m = 6371000.0;
+
+	double x = (lon2 - lon1) * deg_to_rad * cos((lat1 + lat2) / 2 * deg_to_rad);
+	double y = (lat2 - lat1) * deg_to_rad;
+
+	return sqrt(x * x + y * y) * earth_radius_m;
+}
 
 /**
  * Convert an NMEA DDMM.MMMM / DDDMM.MMMM coordinate to signed decimal degrees.
@@ -50,6 +77,7 @@ bool track_is_active() {
  */
 bool track_start(const char *date, const char *time) {
 	active = false;
+	has_last_logged_position = false;
 
 	if (!sdcard_init()) {
 		return false;
@@ -72,7 +100,7 @@ bool track_start(const char *date, const char *time) {
 		return false;
 	}
 
-	sdcard_write_line("timestamp,latitude,longitude,speed_kn");
+	sdcard_write_line("timestamp,latitude,longitude,speed_kn,bearing_deg");
 
 	active = true;
 	ets_printf("Track log started: %s\n", path);
@@ -82,7 +110,7 @@ bool track_start(const char *date, const char *time) {
 /**
  * Log one GNSS fix as a row in the currently open track file.
  */
-void track_log_fix(const char *date, const char *time, const char *latitude, char north_south, const char *longitude, char east_west, float speed_knots) {
+void track_log_fix(const char *date, const char *time, const char *latitude, char north_south, const char *longitude, char east_west, float speed_knots, float bearing_deg) {
 	if (!active) {
 		return;
 	}
@@ -93,10 +121,23 @@ void track_log_fix(const char *date, const char *time, const char *latitude, cha
 	double lat = nmea_to_decimal_degrees(latitude, north_south);
 	double lon = nmea_to_decimal_degrees(longitude, east_west);
 
-	char row[96];
-	snprintf(row, sizeof(row), "%s,%.6f,%.6f,%.2f", timestamp, lat, lon, speed_knots);
+	if (has_last_logged_position) {
+		bool too_close = distance_meters(last_logged_lat, last_logged_lon, lat, lon) < MIN_LOG_DISTANCE_M;
+		bool too_soon = millis() - last_logged_millis < MAX_LOG_INTERVAL_MS;
+		if (too_close && too_soon) {
+			return;
+		}
+	}
+
+	char row[104];
+	snprintf(row, sizeof(row), "%s,%.6f,%.6f,%.2f,%.1f", timestamp, lat, lon, speed_knots, bearing_deg);
 
 	sdcard_write_line(row);
+
+	last_logged_lat = lat;
+	last_logged_lon = lon;
+	last_logged_millis = millis();
+	has_last_logged_position = true;
 }
 
 /**

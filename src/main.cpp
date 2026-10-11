@@ -140,7 +140,7 @@ void read_gnss_data() {
 									parser.lastGPRMC.date, parser.lastGPRMC.utc_time,
 									parser.lastGPRMC.latitude, parser.lastGPRMC.north_south_indicator,
 									parser.lastGPRMC.longitude, parser.lastGPRMC.east_west_indicator,
-									parser.lastGPRMC.speed_over_ground
+									parser.lastGPRMC.speed_over_ground, parser.lastGPRMC.course_over_ground
 								);
 							}
 						}

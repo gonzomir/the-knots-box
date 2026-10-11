@@ -28,8 +28,9 @@ bool track_start(const char *date, const char *time);
  * @param longitude NMEA longitude, DDDMM.MMMM.
  * @param east_west 'E' or 'W'.
  * @param speed_knots Speed over ground, in knots.
+ * @param bearing_deg Course over ground, in degrees true.
  */
-void track_log_fix(const char *date, const char *time, const char *latitude, char north_south, const char *longitude, char east_west, float speed_knots);
+void track_log_fix(const char *date, const char *time, const char *latitude, char north_south, const char *longitude, char east_west, float speed_knots, float bearing_deg);
 
 /**
  * Stop the current track log, flushing and closing the file.
