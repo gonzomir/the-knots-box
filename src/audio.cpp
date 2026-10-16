@@ -8,20 +8,6 @@
 #include "audio.h"
 #include "config.h"
 
-// The I2S bus runs at twice Talkie's 8 kHz sample rate, samples are interpolated.
-#define I2S_SAMPLE_RATE 16000
-#define ES8311_ADDR_LOW 0x18
-#define ES8311_ADDR_HIGH 0x19
-// Software volume, 0-256.
-#define AUDIO_VOLUME 200
-// DAC volume register, 0xBF is 0 dB.
-#define ES8311_DAC_VOLUME 0xBF
-
-#define RING_SIZE 1024
-#define CHUNK 64
-#define PREBUFFER 128
-#define PA_OFF_DELAY_MS 600
-
 static Talkie voice(true, false);
 static i2s_chan_handle_t tx_handle = NULL;
 static uint8_t codec_addr = ES8311_ADDR_LOW;
