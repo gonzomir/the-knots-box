@@ -228,7 +228,8 @@ void audio_say_remaining(int seconds) {
 	// Drop whatever is still queued so the announcement is never late.
 	voice.stop();
 
-	// Numbers only: 270 -> "four thirty", 300 -> "five", 30 -> "thirty".
+	// Numbers only, with "minutes" after whole minutes: 270 -> "four thirty", 300 -> "five minutes",
+	// 30 -> "thirty". The vocabulary has no singular "minute", so 60 is "one minutes".
 	int minutes = seconds / 60;
 	int secs = seconds % 60;
 	if (minutes > 0) {
@@ -236,6 +237,8 @@ void audio_say_remaining(int seconds) {
 	}
 	if (secs > 0) {
 		sayQNumber(&voice, secs);
+	} else {
+		voice.sayQ(sp2_MINUTES);
 	}
 }
 
