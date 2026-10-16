@@ -8,6 +8,7 @@
 #include "esp_bt.h"
 #include "esp_wifi.h"
 
+#include "audio.h"
 #include "battery.h"
 #include "draw.h"
 
@@ -200,6 +201,9 @@ void do_start() {
 		if (do_update_start_timer) {
 			ets_printf("Update start timer, time is %d sec.\n", start_timer_time);
 			draw_start_timer(start_timer_time);
+			if (start_timer_time > 0 && start_timer_time % 30 == 0) {
+				audio_say_remaining(start_timer_time);
+			}
 			do_update_start_timer = false;
 		}
 
@@ -250,6 +254,8 @@ void setup() {
 	draw_time(0, 0 ,0);
 
 	draw_status("Waiting for GPS...");
+
+	setup_audio();
 
 	Serial2.begin(38400, SERIAL_8N1, GNSS_RX, GNSS_TX);
 
@@ -307,6 +313,8 @@ void loop() {
 			do_start();
 			break;
 	}
+
+	audio_loop();
 
 	if (battery_read) {
 		battery_read = false;

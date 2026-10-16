@@ -24,6 +24,15 @@
 #define DISPLAY_W 400
 #define DISPLAY_H 300
 
+// ES8311 audio codec (speaker): I2C control + I2S data.
+#define CODEC_SDA 13
+#define CODEC_SCL 14
+#define I2S_MCLK 16
+#define I2S_BCLK 9
+#define I2S_LRCK 45
+#define I2S_DOUT 8
+#define AUDIO_PA_CTRL 46
+
 #ifndef CONFIG_H
 #define CONFIG_H
 
