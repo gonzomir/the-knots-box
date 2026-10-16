@@ -201,8 +201,14 @@ void do_start() {
 		if (do_update_start_timer) {
 			ets_printf("Update start timer, time is %d sec.\n", start_timer_time);
 			draw_start_timer(start_timer_time);
-			if (start_timer_time > 0 && start_timer_time % 30 == 0) {
-				audio_say_remaining(start_timer_time);
+			// Every 30 seconds, every 10 seconds in the last minute, every second in the last 10, "start" at zero.
+			if (start_timer_time == 0) {
+				audio_say_start();
+			} else if (start_timer_time > 0) {
+				int interval = start_timer_time <= 10 ? 1 : (start_timer_time <= 60 ? 10 : 30);
+				if (start_timer_time % interval == 0) {
+					audio_say_remaining(start_timer_time);
+				}
 			}
 			do_update_start_timer = false;
 		}

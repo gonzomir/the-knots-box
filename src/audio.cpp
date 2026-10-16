@@ -217,16 +217,28 @@ void setup_audio() {
 	ets_printf("Audio ready.\n");
 }
 
+/**
+ * Switch the amplifier on and drop whatever is still queued so the announcement is never late.
+ */
+static void begin_announcement() {
+	digitalWrite(AUDIO_PA_CTRL, HIGH);
+	last_speech_ms = millis();
+	voice.stop();
+}
+
+void audio_say_start() {
+	if (!audio_ready) {
+		return;
+	}
+	begin_announcement();
+	voice.sayQ(sp2_START);
+}
+
 void audio_say_remaining(int seconds) {
 	if (!audio_ready || seconds <= 0) {
 		return;
 	}
-
-	digitalWrite(AUDIO_PA_CTRL, HIGH);
-	last_speech_ms = millis();
-
-	// Drop whatever is still queued so the announcement is never late.
-	voice.stop();
+	begin_announcement();
 
 	// Numbers only, with "minutes" after whole minutes: 270 -> "four thirty", 300 -> "five minutes",
 	// 30 -> "thirty". The vocabulary has no singular "minute", so 60 is "one minutes".

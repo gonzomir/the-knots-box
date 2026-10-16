@@ -14,6 +14,11 @@ void setup_audio();
 void audio_say_remaining(int seconds);
 
 /**
+ * Announce "start". Non-blocking.
+ */
+void audio_say_start();
+
+/**
  * Housekeeping, call from loop(). Switches the amplifier off after speech.
  */
 void audio_loop();
